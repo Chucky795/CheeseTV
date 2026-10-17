@@ -84,3 +84,4 @@ input,select,textarea{width:100%;background:#081022;border:1px solid var(--line)
 .row.spooky .tile.rec:hover{box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 0 2px #ff7a18,0 0 30px rgba(168,85,247,.5)}
 #halloween h3{color:#ff9a3c;text-shadow:0 0 18px rgba(168,85,247,.6)}
 .rec-g{white-space:nowrap}
+.c-mail{margin-top:1rem}.c-mail a{color:var(--gold2);font-weight:700}.c-mail a:hover{text-decoration:underline}.ok{background:rgba(240,165,0,.12);border:1px solid var(--gold);border-radius:12px;padding:.8rem}

@@ -3,7 +3,7 @@ const links=document.querySelector('.links');
 document.querySelector('.burger').onclick=()=>links.classList.toggle('show');
 links.querySelectorAll('a').forEach(a=>a.onclick=()=>links.classList.remove('show'));
 document.querySelectorAll('.acc button').forEach(b=>b.onclick=()=>{const a=b.parentElement,p=b.nextElementSibling;a.classList.toggle('open');p.style.maxHeight=a.classList.contains('open')?p.scrollHeight+'px':0;});
-document.getElementById('form').onsubmit=e=>{e.preventDefault();e.target.querySelector('.ok').hidden=false;e.target.reset();};
+const showThanks=()=>{if(location.hash==='#contact-thanks'){document.getElementById('thanks').hidden=false;document.getElementById('contact').scrollIntoView();}};showThanks();addEventListener('hashchange',showThanks);
 // TV guide
 const times=["7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM"],NOW=2;
 const CH=[["CN","Cheese News",["Evening Report","Market Wrap","Cheese News Tonight","World Desk","Late Briefing","Headline Hour"]],
