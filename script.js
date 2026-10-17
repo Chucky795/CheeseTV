@@ -50,3 +50,4 @@ series:[
 ["The Diplomat",2023,"Political Thriller","An ambassador who never wanted the job keeps averting crises while her marriage burns. Fast, witty and tense.","Netflix"],
 ["VisionQuest",2026,"Superhero Drama","Hunted and haunted by Ultron, Vision has to figure out what he really is. A strange, cerebral Marvel finale.","Disney+"]]};
 document.querySelectorAll('[data-row]').forEach(r=>{const s=r.dataset.row;r.innerHTML=D[s].map(([t,y,g,d,w],i)=>{const[a,b]=s==="halloween"?(i%2?["#a855f7","#1e0a33"]:["#ff7a18","#2a0f00"]):P[i%P.length];return`<article class="tile rec" style="--a:${a};--b:${b}"><div class="rec-top"><span class="rec-no">${String(i+1).padStart(2,'0')}</span><span class="rec-g">${g}</span></div><h4>${t}</h4><p class="rec-y">${y}</p><p class="rec-d">${d}</p><p class="rec-w"><span>Where to watch</span>${w}</p></article>`}).join('')});
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
