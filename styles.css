@@ -85,3 +85,5 @@ input,select,textarea{width:100%;background:#081022;border:1px solid var(--line)
 #halloween h3{color:#ff9a3c;text-shadow:0 0 18px rgba(168,85,247,.6)}
 .rec-g{white-space:nowrap}
 .c-mail{margin-top:1rem}.c-mail a{color:var(--gold2);font-weight:700}.c-mail a:hover{text-decoration:underline}.ok{background:rgba(240,165,0,.12);border:1px solid var(--gold);border-radius:12px;padding:.8rem}
+.logo-img{height:52px;width:auto;display:block;border-radius:8px}
+.f-grid a.logo{display:flex}
