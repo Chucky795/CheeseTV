@@ -80,3 +80,7 @@ input,select,textarea{width:100%;background:#081022;border:1px solid var(--line)
 .rec-g{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;border:1px solid rgba(255,255,255,.25);padding:.2rem .55rem;border-radius:999px}
 .rec h4{font-size:1.35rem;font-weight:800;line-height:1.15;letter-spacing:-.3px}.rec-y{color:var(--a);font-weight:700;font-size:.85rem;margin:.2rem 0 .7rem}
 .rec-d{font-size:.86rem;color:#c3cbe0;flex:1}.rec-w{margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.12);font-size:.85rem;font-weight:700;color:var(--gold2)}.rec-w span{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--mut);font-weight:600}
+.row.spooky .tile.rec{border-color:rgba(255,122,24,.35);box-shadow:inset 0 0 40px rgba(168,85,247,.15)}
+.row.spooky .tile.rec:hover{box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 0 2px #ff7a18,0 0 30px rgba(168,85,247,.5)}
+#halloween h3{color:#ff9a3c;text-shadow:0 0 18px rgba(168,85,247,.6)}
+.rec-g{white-space:nowrap}

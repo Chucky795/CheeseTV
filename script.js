@@ -20,7 +20,18 @@ CH.forEach(([c,n,p])=>{h+=`<div class="g-row"><div class="ch"><i>${c}</i>${n}</d
 g.innerHTML=h;
 // What's Worth Watching (text-only recommendation cards)
 const P=[["#f0a500","#3a1c00"],["#4cc9f0","#0b1a4a"],["#f72585","#2b0538"],["#95d5b2","#0b2b1e"],["#ffd76a","#1b2a5a"],["#e09f3e","#3b0b0e"],["#a78bfa","#14103a"],["#fb8b24","#2a0f1e"]];
-const D={movies:[
+const D={halloween:[
+["Halloween",1978,"Slasher","A masked killer comes home to a quiet suburb on the spookiest night of the year. The blueprint for every slasher that followed.","Shudder, AMC+"],
+["Psycho",1960,"Psychological Thriller","A woman on the run checks into a lonely motel run by a polite young man. Hitchcock's twisty, endlessly copied shocker.","Netflix, Peacock"],
+["The Exorcist",1973,"Supernatural","A mother turns to two priests when her daughter starts changing in terrifying ways. Still one of the scariest films ever made.","HBO Max"],
+["Alien",1979,"Sci-Fi Horror","A space freighter crew picks up an uninvited guest. Claustrophobic, relentless and beautifully built.","Netflix"],
+["The Shining",1980,"Psychological Horror","A writer takes his family to a snowed-in hotel for the winter, and the hotel takes him. Hypnotic, icy dread.","HBO Max"],
+["Get Out",2017,"Social Thriller","A weekend with his girlfriend's family turns into something far more sinister. Sharp, funny and deeply unnerving.","Peacock"],
+["Hereditary",2018,"Supernatural","A grieving family uncovers a dark inheritance. Devastating, and it lingers for days.","HBO Max, Hulu, Prime Video"],
+["Talk to Me",2023,"Supernatural","Teens get hooked on a party trick that lets spirits in. Slick, fast and genuinely scary.","HBO Max"],
+["Sinners",2025,"Vampire Horror","Twin brothers open a juke joint in 1930s Mississippi, and something hungry shows up. Bold, musical and bloody.","HBO Max"],
+["Weapons",2025,"Mystery Horror","A whole class of kids vanishes in the same night, and a town hunts for answers. Puzzle-box horror with a wicked streak.","HBO Max, Prime Video"]],
+movies:[
 ["Disclosure Day",2026,"Sci-Fi Thriller","A world-shaking question about life beyond Earth becomes very personal. Big-canvas suspense with real heart.","Peacock"],
 ["Backrooms",2026,"Horror","A man slips into an endless maze of empty, buzzing office spaces. Pure liminal dread, inspired by the internet legend.","HBO Max"],
 ["Obsession",2026,"Horror","One careless wish makes a coworker devoted to him, and it goes horribly wrong. A smart, unsettling twist on possession stories.","Peacock"],
@@ -38,4 +49,4 @@ series:[
 ["War",2026,"Legal Drama","Two powerhouse London law firms go to battle over an explosive divorce. Slick, cutthroat courtroom drama.","HBO Max"],
 ["The Diplomat",2023,"Political Thriller","An ambassador who never wanted the job keeps averting crises while her marriage burns. Fast, witty and tense.","Netflix"],
 ["VisionQuest",2026,"Superhero Drama","Hunted and haunted by Ultron, Vision has to figure out what he really is. A strange, cerebral Marvel finale.","Disney+"]]};
-document.querySelectorAll('[data-row]').forEach(r=>{const s=r.dataset.row;r.innerHTML=D[s].map(([t,y,g,d,w],i)=>{const[a,b]=P[i%P.length];return`<article class="tile rec" style="--a:${a};--b:${b}"><div class="rec-top"><span class="rec-no">${String(i+1).padStart(2,'0')}</span><span class="rec-g">${g}</span></div><h4>${t}</h4><p class="rec-y">${y}</p><p class="rec-d">${d}</p><p class="rec-w"><span>Where to watch</span>${w}</p></article>`}).join('')});
+document.querySelectorAll('[data-row]').forEach(r=>{const s=r.dataset.row;r.innerHTML=D[s].map(([t,y,g,d,w],i)=>{const[a,b]=s==="halloween"?(i%2?["#a855f7","#1e0a33"]:["#ff7a18","#2a0f00"]):P[i%P.length];return`<article class="tile rec" style="--a:${a};--b:${b}"><div class="rec-top"><span class="rec-no">${String(i+1).padStart(2,'0')}</span><span class="rec-g">${g}</span></div><h4>${t}</h4><p class="rec-y">${y}</p><p class="rec-d">${d}</p><p class="rec-w"><span>Where to watch</span>${w}</p></article>`}).join('')});
