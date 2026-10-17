@@ -4,20 +4,26 @@ document.querySelector('.burger').onclick=()=>links.classList.toggle('show');
 links.querySelectorAll('a').forEach(a=>a.onclick=()=>links.classList.remove('show'));
 document.querySelectorAll('.acc button').forEach(b=>b.onclick=()=>{const a=b.parentElement,p=b.nextElementSibling;a.classList.toggle('open');p.style.maxHeight=a.classList.contains('open')?p.scrollHeight+'px':0;});
 const showThanks=()=>{if(location.hash==='#contact-thanks'){document.getElementById('thanks').hidden=false;document.getElementById('contact').scrollIntoView();}};showThanks();addEventListener('hashchange',showThanks);
-// TV guide
-const times=["7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM"],NOW=2;
-const CH=[["CN","Cheese News",["Evening Report","Market Wrap","Cheese News Tonight","World Desk","Late Briefing","Headline Hour"]],
-["GS1","Gouda Sports 1",["Pre-Game Live","Pre-Game Live","Championship Night","Championship Night","Post-Game Show","Highlights"]],
-["GS2","Gouda Sports 2",["Golf Classics","Fight Night Prelims","Fight Night Prelims","Racing Weekly","Tennis Gold","Goal Rush"]],
-["BRI","Brie Cinema",["The Last Lighthouse","The Last Lighthouse","Midnight Run to Orion","Midnight Run to Orion","Golden Hour","Golden Hour"]],
-["CHD","Cheddar Kids",["Toon Town","Little Explorers","Mouse Patrol","Mouse Patrol","Dino Friends","Bedtime Tales"]],
-["MZ","Mozz Movies",["Iron Circuit","Iron Circuit","Shadow Protocol","Shadow Protocol","Desert Echoes","Desert Echoes"]],
-["SWS","Swiss Docs",["Wild Alps","Ocean Deep","Planet Pantry","Ancient Cities","Ancient Cities","Night Sky"]],
-["PRM","Parmesan Prime",["Kitchen Chaos","Harbor Street","Harbor Street","The Quiet Detective","Starfall Academy","Starfall Academy"]]];
+// TV guide: real US listings from TVmaze (CC BY-SA), text only
 const g=document.getElementById('guideGrid');
-let h='<div class="g-row g-head"><div>Channel</div>'+times.map((t,i)=>`<div class="${i==NOW?'now-col':''}">${t}${i==NOW?' · NOW':''}</div>`).join('')+'</div>';
-CH.forEach(([c,n,p])=>{h+=`<div class="g-row"><div class="ch"><i>${c}</i>${n}</div>`+p.map((x,i)=>`<div class="prog ${i==NOW?'now':''}"><b>${x}</b><small>${times[i]}</small></div>`).join('')+'</div>'});
-g.innerHTML=h;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const tfmt=d=>d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+async function loadGuide(){
+  const now=new Date(),tmr=new Date(now.getTime()+864e5);
+  try{
+    const res=await Promise.all([now,tmr].map(d=>fetch(`https://api.tvmaze.com/schedule?country=US&date=${ymd(d)}`).then(r=>{if(!r.ok)throw 0;return r.json()})));
+    const by={};
+    res.flat().forEach(e=>{const net=e.show&&e.show.network&&e.show.network.name;if(!net||!e.airstamp)return;
+      const s=new Date(e.airstamp),en=new Date(s.getTime()+(e.runtime||e.show.runtime||30)*6e4);
+      if(en<=now||s-now>4*36e5)return;(by[net]=by[net]||[]).push({s,en,show:e.show.name,ep:e.name,sn:e.season,num:e.number});});
+    const rows=Object.entries(by).map(([n,l])=>{l.sort((a,b)=>a.s-b.s);return[n,l.slice(0,3)]})
+      .sort((a,b)=>(b[1][0].s<=now)-(a[1][0].s<=now)||a[1][0].s-b[1][0].s).slice(0,14);
+    if(!rows.length)throw 0;
+    g.innerHTML=`<div class="lg-head"><span>Network</span><span>Now &amp; next · ${esc(tfmt(now))}</span></div>`+rows.map(([n,l])=>`<div class="lg-row"><div class="lg-net">${esc(n)}</div><div class="lg-progs">${l.map(p=>{const on=p.s<=now;const ep=p.ep&&p.ep!==p.show?`${p.sn&&p.num?`S${p.sn} E${p.num} · `:''}${esc(p.ep)}`:'';return`<div class="lg-p${on?' now':''}"><span class="lg-t">${on?'<em>ON NOW</em> ':''}${esc(tfmt(p.s))} – ${esc(tfmt(p.en))}</span><b>${esc(p.show)}</b>${ep?`<small>${ep}</small>`:''}</div>`}).join('')}</div></div>`).join('');
+  }catch(_){g.innerHTML='<p class="lg-fail">📺 We couldn\'t load live TV listings right now. Please check back in a few minutes.</p>';}
+}
+loadGuide();setInterval(loadGuide,5*6e4);
 // What's Worth Watching (text-only recommendation cards)
 const P=[["#f0a500","#3a1c00"],["#4cc9f0","#0b1a4a"],["#f72585","#2b0538"],["#95d5b2","#0b2b1e"],["#ffd76a","#1b2a5a"],["#e09f3e","#3b0b0e"],["#a78bfa","#14103a"],["#fb8b24","#2a0f1e"]];
 const D={halloween:[
