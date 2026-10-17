@@ -96,3 +96,13 @@ input,select,textarea{width:100%;background:#081022;border:1px solid var(--line)
 .lg-p.now{background:linear-gradient(135deg,rgba(240,165,0,.22),rgba(240,165,0,.06));box-shadow:inset 3px 0 0 var(--gold)}
 .lg-fail{padding:2rem;text-align:center;color:var(--mut)}.lg-note{margin-top:.7rem;font-size:.8rem;color:var(--mut)}
 @media(max-width:720px){.lg-row{grid-template-columns:1fr}.lg-net{padding:.7rem 1rem}.lg-progs{grid-template-columns:1fr}.lg-p{border-left:0;border-top:1px solid var(--line)}}
+
+.fab{position:fixed;right:18px;bottom:18px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fab-btn{width:62px;height:62px;border-radius:50%;border:3px solid #f5c242;padding:0;overflow:hidden;cursor:pointer;background:#0b1630;box-shadow:0 8px 24px rgba(0,0,0,.45);animation:fabfloat 3s ease-in-out infinite}
+.fab-btn img{width:100%;height:100%;object-fit:cover;display:block}
+.fab-btn:hover{transform:scale(1.07)}
+.fab-menu{background:#0f1d3d;border:1px solid rgba(245,194,66,.5);border-radius:14px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;min-width:190px}
+.fab-menu[hidden]{display:none}
+.fab-menu a{color:#fff;text-decoration:none;padding:11px 14px;border-radius:10px;font-weight:600;font-size:15px}
+.fab-menu a:hover{background:rgba(245,194,66,.18);color:#f5c242}
+@keyframes fabfloat{0%,100%{translate:0 0}50%{translate:0 -6px}}
