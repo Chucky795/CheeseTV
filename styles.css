@@ -73,3 +73,10 @@ input,select,textarea{width:100%;background:#081022;border:1px solid var(--line)
 .co{margin-top:1.1rem;padding-top:1rem;border-top:1px dashed var(--line);opacity:.9}.co .fighter b{font-size:clamp(.95rem,1.6vw,1.2rem);font-weight:700}.co .flag{font-size:1.2rem}.co .vs{font-size:1.4rem;text-shadow:0 0 10px rgba(240,165,0,.7)}
 .f-venue{color:var(--mut);font-size:.85rem;margin-top:1rem;text-align:center}.f-venue::before{content:"📍 "}.note{color:var(--mut);font-size:.8rem;margin-top:1.5rem}
 @media(max-width:560px){.vsrow{grid-template-columns:1fr;gap:.3rem;text-align:center}.fighter.l,.fighter.r{justify-content:center;flex-direction:row}.fight{padding:1.3rem}}
+
+#watch .row-head h3{font-size:1.4rem;margin-top:1.5rem}
+.tile.rec{flex:0 0 260px;aspect-ratio:auto;min-height:360px;display:flex;flex-direction:column;padding:1.3rem;background:radial-gradient(circle at 85% 0%,color-mix(in srgb,var(--a) 45%,transparent),transparent 60%),linear-gradient(165deg,var(--b),#070c1a 80%)}
+.rec-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}.rec-no{font-size:2.6rem;font-weight:900;line-height:1;color:transparent;-webkit-text-stroke:1.5px var(--a)}
+.rec-g{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;border:1px solid rgba(255,255,255,.25);padding:.2rem .55rem;border-radius:999px}
+.rec h4{font-size:1.35rem;font-weight:800;line-height:1.15;letter-spacing:-.3px}.rec-y{color:var(--a);font-weight:700;font-size:.85rem;margin:.2rem 0 .7rem}
+.rec-d{font-size:.86rem;color:#c3cbe0;flex:1}.rec-w{margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.12);font-size:.85rem;font-weight:700;color:var(--gold2)}.rec-w span{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--mut);font-weight:600}
