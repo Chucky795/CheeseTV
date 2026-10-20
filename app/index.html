@@ -5,7 +5,7 @@
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><link rel="icon" href="/icons/favicon-32.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CheeseTV">
-<link rel="stylesheet" href="/app/app.css?v=2"></head><body>
+<link rel="stylesheet" href="/app/app.css?v=3"></head><body>
 
 <section id="signin" class="signin" hidden>
  <div class="glow"></div><div class="streak s1"></div><div class="streak s2"></div>
@@ -14,8 +14,8 @@
   <h1 class="wordmark">CHEESE<span>TV</span></h1>
   <p class="tagline">YOUR TV. <span>SUPERCHARGED.</span></p>
   <div class="seg" id="siSeg"><button data-t="xt" class="on">Sign in</button><button data-t="m3u">Use M3U link</button></div>
-  <form id="fXt"><label>Server URL<input name="server" type="url" required placeholder="https://your-provider.com:port" autocomplete="off"></label><label>Username<input name="user" required autocomplete="username"></label><label>Password<input name="pass" type="password" required autocomplete="current-password"></label><button class="btn gold">Sign in</button></form>
-  <form id="fM3u" hidden><label>Playlist name<input name="name" placeholder="My playlist"></label><label>Playlist URL<input name="url" type="url" required placeholder="https://..."></label><label>TV guide (XMLTV) URL, optional<input name="epg" type="url" placeholder="https://..."></label><button class="btn gold">Add playlist</button></form>
+  <form id="fXt" novalidate><label>Server URL<input name="server" type="text" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" placeholder="provider.com:8080 or paste your M3U link" autocomplete="url"></label><label>Username<input name="user" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" autocomplete="username"></label><label>Password<input name="pass" type="password" enterkeyhint="go" autocomplete="current-password"></label><button class="btn gold">Sign in</button></form>
+  <form id="fM3u" hidden novalidate><label>Playlist name<input name="name" placeholder="My playlist"></label><label>Playlist URL<input name="url" type="text" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="https://..."></label><label>TV guide (XMLTV) URL, optional<input name="epg" type="text" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="https://..."></label><button class="btn gold">Add playlist</button></form>
   <p id="siMsg" class="msg"></p>
   <p class="fine">CheeseTV is a blank player: no channels are included. Your login is saved only on this device and never sent to CheeseTV. <a href="#" id="siWhy">Why do some channels only work in the apps?</a></p>
   <button class="link" id="siCancel" hidden>Cancel</button>
@@ -75,5 +75,5 @@
 
 <div id="sheet" class="sheet" hidden><div class="card" id="sheetCard"></div></div>
 <div id="toast" class="toast" hidden></div>
-<script src="/app/vendor/hls.min.js" defer></script><script src="/app/vendor/mpegts.js" defer></script><script src="/app/app.js?v=2" defer></script>
+<script src="/app/vendor/hls.min.js" defer></script><script src="/app/vendor/mpegts.js" defer></script><script src="/app/app.js?v=3" defer></script>
 </body></html>
