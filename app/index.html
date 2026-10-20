@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CheeseTV Web Player</title><meta name="description" content="CheeseTV web player for iPhone and desktop. Blank player: add your own playlist.">
+<meta name="theme-color" content="#0e1830"><link rel="manifest" href="/app/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><link rel="icon" href="/icons/favicon-32.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="CheeseTV">
+<link rel="stylesheet" href="/app/app.css"></head><body>
+<header class="top"><div class="brand"><img src="/assets/logo-112.png" alt=""><div><b>CheeseTV</b><small id="sub">Web Player</small></div></div>
+<button class="ic" id="btnSettings" aria-label="Playlists">&#9881;</button></header>
+<div class="search"><span>&#128269;</span><input id="q" placeholder="Search channels" autocomplete="off"></div>
+<div class="chips" id="groups"></div>
+<main id="main">
+<section id="empty" class="empty" hidden><img src="/assets/logo-112.png" alt=""><h2>Welcome to CheeseTV</h2><p>CheeseTV is a blank player. No channels are included. Add your own playlist to start watching.</p><button class="btn" id="btnAdd1">Add playlist / Xtream login</button><p class="note" id="iosHint" hidden>Tip: tap <b>Share</b> &#8679; then <b>Add to Home Screen</b> to install CheeseTV like an app.</p></section>
+<section id="list" class="list"></section>
+<section id="guide" class="guide" hidden></section>
+</main>
+<div id="player" class="player" hidden><div class="pbar"><button class="ic" id="btnClose" aria-label="Close">&#8592;</button><div class="pt"><b id="pName"></b><small id="pNow"></small></div><button class="ic" id="btnFavP" aria-label="Favorite">&#9734;</button></div>
+<video id="video" controls playsinline autoplay></video><div id="pStatus" class="pstatus"></div><div id="pErr" class="perr" hidden></div></div>
+<nav class="tabs"><button data-v="list" class="on">&#128250;<span>Live TV</span></button><button data-v="fav">&#9733;<span>Favorites</span></button><button data-v="guide">&#9638;<span>Guide</span></button><button data-v="set">&#9881;<span>Settings</span></button></nav>
+<div id="sheet" class="sheet" hidden><div class="card"><div class="ch"><h3>Playlists</h3><button class="ic" id="btnSheetX">&#10005;</button></div>
+<div id="plList"></div>
+<div class="seg"><button data-t="m3u" class="on">M3U link</button><button data-t="xt">Xtream login</button></div>
+<form id="fM3u"><label>Playlist name<input name="name" required placeholder="My playlist"></label><label>Playlist URL<input name="url" type="url" required placeholder="https://..."></label><label>EPG / XMLTV URL (optional)<input name="epg" type="url" placeholder="https://..."></label><button class="btn">Add playlist</button></form>
+<form id="fXt" hidden><label>Playlist name<input name="name" required placeholder="My provider"></label><label>Server URL<input name="server" type="url" required placeholder="https://provider:port"></label><label>Username<input name="user" required autocomplete="off"></label><label>Password<input name="pass" type="password" required autocomplete="off"></label><button class="btn">Log in</button></form>
+<p class="note">Your playlist and login are saved only on this device (browser storage). CheeseTV never sends them to our servers.</p>
+<details class="note"><summary>Why won't some channels play in a browser?</summary><p>Browsers have security rules that apps don't. A secure page (https) is not allowed to load <b>http://</b> streams or playlists ("mixed content"), and the provider's server must allow web access (CORS). Many IPTV providers only offer http or block browsers. Those channels still work in the <b>CheeseTV Android / Google TV app</b>, on <b>Roku</b>, and in the upcoming <b>CheeseTV iPhone app</b>.</p></details>
+<p id="fMsg" class="msg"></p></div></div>
+<script src="/app/vendor/hls.min.js" defer></script><script src="/app/vendor/mpegts.js" defer></script><script src="/app/app.js" defer></script>
+</body></html>
