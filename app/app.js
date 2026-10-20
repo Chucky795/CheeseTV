@@ -19,7 +19,7 @@ function toast(t,ms=3200){const e=$('#toast');e.textContent=t;e.hidden=false;cle
 /* ---------- network (direct from the viewer's browser; no proxy) ---------- */
 const WHY="Browsers have security rules that apps don't. A secure page (https) can't load http:// links (\"mixed content\"), and the provider's server must allow web access (CORS). Many IPTV providers only offer http or block browsers. Those channels still work in the CheeseTV Android / Google TV app, on Roku, and in the upcoming CheeseTV iPhone app.";
 async function getText(url,what,o){
- if(isMixed(url))throw new Error(`This ${what} link starts with http://. A secure web page (https) isn't allowed to load http links. Ask your provider for an https link, or use the CheeseTV Android/Roku app.`);
+ if(isMixed(url))throw new Error(`This ${what} link uses http:// (not secure). Web browsers (Safari and Chrome) block http links on secure websites, so the CheeseTV web app can't load it. ${APPS}`);
  let r;try{r=await fetch(url,{cache:'no-store'})}catch(e){throw new Error(`Couldn't reach the ${what}. The server is offline, or it blocks web browsers (CORS). The CheeseTV Android/Roku app can still load it.`)}
  if(!r.ok)throw new Error(`The ${what} server answered with error ${r.status}.`);if(o)o.url=r.url||url;return r.text();
 }
@@ -374,12 +374,49 @@ function showSignin(cancel){$('#signin').hidden=false;$('#siSeg [data-t=xt]').cl
 $('#siCancel').onclick=()=>{$('#signin').hidden=true};
 $('#siWhy').onclick=e=>{e.preventDefault();const m=$('#siMsg');m.className='msg';m.textContent=WHY};
 $$('#siSeg button').forEach(b=>b.onclick=()=>{$$('#siSeg button').forEach(x=>x.classList.toggle('on',x===b));$('#fXt').hidden=b.dataset.t!=='xt';$('#fM3u').hidden=b.dataset.t!=='m3u';$('#siMsg').textContent=''});
-async function addPl(p,form){const m=$('#siMsg'),btn=form.querySelector('.btn'),bt=btn.textContent;m.className='msg';m.textContent='';btn.textContent='Checking…';btn.disabled=true;
- try{if(p.type==='xt')await loadXtream(p);else parseM3U(await getText(p.url,'playlist'))}catch(e){m.className='msg e';m.textContent=e.message;btn.textContent=bt;btn.disabled=false;return}
- btn.textContent=bt;btn.disabled=false;form.reset();p.id='p'+Date.now();S.pls.push(p);S.active=p.id;S.group='All';S.view='guide';save();loadActive()}
-$('#fXt').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),server=f.get('server').trim();let host=server;try{host=new URL(server).hostname}catch(x){}
- addPl({type:'xt',name:host,server,user:f.get('user').trim(),pass:f.get('pass')},e.target)};
-$('#fM3u').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),url=f.get('url').trim();addPl({type:'m3u',name:f.get('name').trim()||'My playlist',url,epg:f.get('epg').trim()},e.target)};
+const APPS="Please use the CheeseTV Android / Google TV app or Roku, or the upcoming CheeseTV iPhone app. Or ask your provider for an https:// server address.";
+function normXt(raw,user,pass){raw=(raw||'').trim().replace(/\s+/g,'');user=(user||'').trim();pass=(pass||'').trim();
+ if(!raw)throw new Error('Enter your server URL (for example http://provider.com:8080).');
+ if(!/^[a-z][a-z0-9+.-]*:\/\//i.test(raw))raw='http://'+raw.replace(/^\/+/,'');
+ let u;try{u=new URL(raw)}catch(e){throw new Error("That server address doesn't look right. It usually looks like http://provider.com:8080")}
+ if(!/^https?:$/.test(u.protocol)||!u.hostname.includes('.')&&u.hostname!=='localhost')throw new Error("That server address doesn't look right. It usually looks like http://provider.com:8080");
+ const q=u.searchParams;if(q.get('username')&&!user)user=q.get('username');if(q.get('password')&&!pass)pass=q.get('password');
+ let path=u.pathname.replace(/\/(get|player_api|xmltv|panel_api|portal)\.php$/i,'').replace(/\/(c|live|movie|series)(\/.*)?$/i,'').replace(/\/+$/,'');
+ if(!user)throw new Error('Enter your username.');if(!pass)throw new Error('Enter your password.');
+ return {server:u.protocol+'//'+u.host+path,user,pass,wasHttp:u.protocol==='http:'};
+}
+async function fetchT(url,ms=15000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{return await fetch(url,{cache:'no-store',signal:c.signal})}finally{clearTimeout(t)}}
+async function xtProbe(server,user,pass){const host=new URL(server).host;let r;
+ try{r=await fetchT(`${server}/player_api.php?username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)}
+ catch(e){if(e.name==='AbortError')throw {k:'timeout',m:`${host} didn't answer within 15 seconds. Check the server address and port (for example :8080), or try again later.`};
+  throw {k:'net',m:`Couldn't connect to ${host}. The server may be offline, the address or port may be wrong, or your provider blocks web browsers (CORS). If this login works in the CheeseTV Android or Roku app, your provider is blocking browsers. ${APPS}`}}
+ if(r.status===401||r.status===403)throw {k:'auth',m:`The server refused this login (error ${r.status}). Check your username and password, or your account may be blocked or expired.`};
+ if(r.status===404)throw {k:'http',m:`There's no Xtream service at this address (error 404). Check the server URL and port.`};
+ if(!r.ok)throw {k:'http',m:`The provider's server is having problems (error ${r.status}). Try again later.`};
+ let j;try{j=JSON.parse(await r.text())}catch(e){throw {k:'notxt',m:"That address answered, but it isn't an Xtream server. Check the server URL. It usually looks like http://provider.com:8080"}}
+ const ui=j&&j.user_info;if(!ui||String(ui.auth)!=='1')throw {k:'auth',m:'Wrong username or password. The server answered but rejected this login. Usernames and passwords are case-sensitive, so check capital letters and typos.'};
+ if(ui.status&&!/active/i.test(ui.status))throw {k:'auth',m:`The server says this account is "${ui.status}". Contact your provider.`};
+ return j}
+async function xtResolve(p){
+ const pageHttps=location.protocol==='https:';
+ if(pageHttps&&/^http:/i.test(p.server)){const u=new URL(p.server),https='https://'+u.host+u.pathname.replace(/\/+$/,'');
+  try{await xtProbe(https,p.user,p.pass);p.server=https;return}catch(e){if(e.k==='auth')throw new Error(e.m)}
+  throw new Error(`Your provider's server uses http:// (not secure), and it doesn't support https://. Web browsers (Safari and Chrome) block http connections from secure websites, so the CheeseTV web app can't sign in to this provider. This is a browser rule, not a problem with your login. ${APPS}`)}
+ try{await xtProbe(p.server,p.user,p.pass)}catch(e){throw new Error(e.m||String(e))}}
+async function addPl(p,form){const m=$('#siMsg'),btn=form.querySelector('.btn'),bt=btn.textContent;m.className='msg';m.textContent='';btn.textContent='Signing in…';btn.disabled=true;
+ const fail=t=>{m.className='msg e';m.textContent=t;m.scrollIntoView({block:'center',behavior:'smooth'})};
+ try{if(p.type==='xt'){await xtResolve(p);await loadXtream(p)}else{if(isMixed(p.url)){const h='https://'+p.url.slice(7);try{parseM3U(await getText(h,'playlist'));p.url=h}catch(e){}}parseM3U(await getText(p.url,'playlist'))}}catch(e){fail(e.message||String(e));return}finally{btn.textContent=bt;btn.disabled=false}
+ form.reset();p.id='p'+Date.now();S.pls.push(p);S.active=p.id;S.group='All';S.view='guide';save();loadActive()}
+$('#fXt').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),m=$('#siMsg');let n;
+ try{n=normXt(f.get('server'),f.get('user'),f.get('pass'))}catch(x){m.className='msg e';m.textContent=x.message;return}
+ const F=e.target.elements;F.server.value=n.server;F.user.value=n.user;if(!F.pass.value)F.pass.value=n.pass;
+ addPl({type:'xt',name:new URL(n.server).hostname,server:n.server,user:n.user,pass:n.pass},e.target)};
+$('#fM3u').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),m=$('#siMsg');let url=(f.get('url')||'').trim();
+ if(!url){m.className='msg e';m.textContent='Paste your playlist (M3U) link.';return}if(!/^[a-z]+:\/\//i.test(url))url='http://'+url;
+ const xm=url.match(/get\.php\?/i)&&new URL(url).searchParams;
+ if(xm&&xm.get('username')&&xm.get('password')){ // an Xtream M3U link: sign in with Xtream instead (works better, adds Movies & Series)
+  let n;try{n=normXt(url,'','')}catch(x){m.className='msg e';m.textContent=x.message;return}addPl({type:'xt',name:new URL(n.server).hostname,server:n.server,user:n.user,pass:n.pass},e.target);return}
+ addPl({type:'m3u',name:(f.get('name')||'').trim()||'My playlist',url,epg:(f.get('epg')||'').trim()},e.target)};
 setInterval(()=>{if(!$('#shell').hidden&&$('#player').hidden&&S.view==='guide')renderGuide();updNow()},60000);
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/app/sw.js',{scope:'/app/'}).catch(()=>{});
 navigator.storage?.persist?.().catch(()=>{});
