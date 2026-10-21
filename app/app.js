@@ -374,6 +374,7 @@ function showSignin(cancel){$('#signin').hidden=false;$('#siSeg [data-t=xt]').cl
 $('#siCancel').onclick=()=>{$('#signin').hidden=true};
 $('#siWhy').onclick=e=>{e.preventDefault();const m=$('#siMsg');m.className='msg';m.textContent=WHY};
 $$('#siSeg button').forEach(b=>b.onclick=()=>{$$('#siSeg button').forEach(x=>x.classList.toggle('on',x===b));$('#fXt').hidden=b.dataset.t!=='xt';$('#fM3u').hidden=b.dataset.t!=='m3u';$('#siMsg').textContent=''});
+const HTTP_COPY='http://tv.watchcheesetv.com/';
 const APPS="Please use the CheeseTV Android / Google TV app or Roku, or the upcoming CheeseTV iPhone app. Or ask your provider for an https:// server address.";
 function normXt(raw,user,pass){raw=(raw||'').trim().replace(/\s+/g,'');user=(user||'').trim();pass=(pass||'').trim();
  if(!raw)throw new Error('Enter your server URL (for example http://provider.com:8080).');
@@ -404,7 +405,8 @@ async function xtResolve(p){
   throw new Error(`Your provider's server uses http:// (not secure), and it doesn't support https://. Web browsers (Safari and Chrome) block http connections from secure websites, so the CheeseTV web app can't sign in to this provider. This is a browser rule, not a problem with your login. ${APPS}`)}
  try{await xtProbe(p.server,p.user,p.pass)}catch(e){throw new Error(e.m||String(e))}}
 async function addPl(p,form){const m=$('#siMsg'),btn=form.querySelector('.btn'),bt=btn.textContent;m.className='msg';m.textContent='';btn.textContent='Signing in…';btn.disabled=true;
- const fail=t=>{m.className='msg e';m.textContent=t;m.scrollIntoView({block:'center',behavior:'smooth'})};
+ const fail=t=>{m.className='msg e';m.textContent=t;if(location.protocol==='https:'&&/uses http:\/\//.test(t)){const a=document.createElement('a');a.className='btn gold';a.id='btnHttpCopy';a.href=HTTP_COPY;a.style.marginTop='12px';a.textContent='Open CheeseTV for http providers';m.appendChild(a);
+  const n=document.createElement('p');n.className='fine';n.textContent="It opens a non-secure (http) copy of this player that can connect to http providers. You'll sign in again there.";m.appendChild(n)}m.scrollIntoView({block:'center',behavior:'smooth'})};
  try{if(p.type==='xt'){await xtResolve(p);await loadXtream(p)}else{if(isMixed(p.url)){const h='https://'+p.url.slice(7);try{parseM3U(await getText(h,'playlist'));p.url=h}catch(e){}}parseM3U(await getText(p.url,'playlist'))}}catch(e){fail(e.message||String(e));return}finally{btn.textContent=bt;btn.disabled=false}
  form.reset();p.id='p'+Date.now();S.pls.push(p);S.active=p.id;S.group='All';S.view='guide';save();loadActive()}
 $('#fXt').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),m=$('#siMsg');let n;
