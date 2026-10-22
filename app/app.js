@@ -374,7 +374,7 @@ function showSignin(cancel){$('#signin').hidden=false;$('#siSeg [data-t=xt]').cl
 $('#siCancel').onclick=()=>{$('#signin').hidden=true};
 $('#siWhy').onclick=e=>{e.preventDefault();const m=$('#siMsg');m.className='msg';m.textContent=WHY};
 $$('#siSeg button').forEach(b=>b.onclick=()=>{$$('#siSeg button').forEach(x=>x.classList.toggle('on',x===b));$('#fXt').hidden=b.dataset.t!=='xt';$('#fM3u').hidden=b.dataset.t!=='m3u';$('#siMsg').textContent=''});
-const HTTP_COPY='http://tv.watchcheesetv.com/';
+const HTTP_COPY='http://live.watchcheesetv.com/';
 const APPS="Please use the CheeseTV Android / Google TV app or Roku, or the upcoming CheeseTV iPhone app. Or ask your provider for an https:// server address.";
 function normXt(raw,user,pass){raw=(raw||'').trim().replace(/\s+/g,'');user=(user||'').trim();pass=(pass||'').trim();
  if(!raw)throw new Error('Enter your server URL (for example http://provider.com:8080).');
