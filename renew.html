@@ -1,0 +1,56 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Renew my service | CheeseTV</title><meta name="robots" content="noindex">
+<link rel="stylesheet" href="styles.css?v=20261022b"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<style>
+.rn{max-width:520px;margin:auto;padding:2rem 0 4rem}.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:20px;padding:1.4rem;margin-top:1.2rem}
+label{display:block;font-weight:600;font-size:.9rem;margin:.9rem 0 .3rem}input{width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);background:#060c1c;color:var(--tx);font-size:1rem}
+input:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6rem;margin-top:.4rem}
+.opt{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1rem;border:1px solid var(--line);border-radius:14px;cursor:pointer;font-weight:600}
+.opt input{width:auto;margin-right:.6rem;accent-color:var(--gold)}.opt.on{border:2px solid var(--gold);background:rgba(240,165,0,.08)}.opt b{color:var(--gold2)}
+.total{display:flex;justify-content:space-between;font-size:1.3rem;font-weight:800;margin-top:1rem}.total b{color:var(--gold)}
+.nc{color:var(--gold2);font-weight:600;font-size:.9rem;margin-top:.4rem}.zl{line-height:1.7}.zl code{background:#060c1c;padding:.15rem .45rem;border-radius:6px;color:var(--gold2)}
+.cp{display:flex;gap:.5rem;margin-top:.8rem}.cp .btn{flex:1;text-align:center}.msg{margin-top:1rem;font-weight:600}.err{color:#ff7a7a}.ok{color:#7dffa8}
+</style></head><body>
+<header class="nav"><div class="wrap nav-in"><a class="logo" href="/">🧀 Cheese<span>TV</span></a><a class="btn sm ghost" href="/">Home</a></div></header>
+<main class="wrap rn">
+<p class="eyebrow">Returning customers</p><h2>Renew my service</h2>
+<p class="sub" style="margin-bottom:0">Pay with Zelle in 3 quick steps. We'll renew your account as soon as we confirm your payment.</p>
+<form id="f" class="card" novalidate>
+<h3>1. Your account</h3>
+<label for="u">CheeseTV username</label><input id="u" autocomplete="username" required maxlength="64">
+<label for="n">Your name</label><input id="n" autocomplete="name" required maxlength="80">
+<label for="c">Phone or email (so we can reach you)</label><input id="c" required maxlength="120">
+<h3 style="margin-top:1.4rem">2. How many connections?</h3>
+<!-- PRICES: edit data-price and the text below -->
+<div class="opts" id="opts">
+<label class="opt on"><span><input type="radio" name="k" value="1" data-price="14.99" checked>1 connection</span><b>$14.99/month</b></label>
+<label class="opt"><span><input type="radio" name="k" value="2" data-price="19.99">2 connections</span><b>$19.99/month</b></label>
+<label class="opt"><span><input type="radio" name="k" value="3" data-price="27.99">3 connections</span><b>$27.99/month</b></label>
+</div>
+<p class="nc">✓ Pay as you go, no contract, cancel anytime</p>
+<div class="total"><span>Total this month</span><b id="t">$14.99</b></div>
+<h3 style="margin-top:1.4rem">3. Send with Zelle</h3>
+<p class="zl">Send <code id="za">$14.99</code> via Zelle to <b>[ZELLE_CONTACT]</b> ([ZELLE_NAME]) with memo: <code id="zm">CheeseTV &lt;username&gt;</code></p>
+<div class="cp"><button type="button" class="btn sm ghost" id="ca">Copy amount</button><button type="button" class="btn sm ghost" id="cm">Copy memo</button></div>
+<button class="btn lg block" style="margin-top:1.4rem" id="go">I've sent the payment</button>
+<p class="msg" id="m" role="status"></p>
+</form></main>
+<script>
+const SB="https://vrmtxrtzweblakuvkwoe.supabase.co",KEY="sb_publishable_zvptRN1xVVYyt6jP1B-5vA_netcK9Vm";
+const $=id=>document.getElementById(id);let amt="14.99";
+function upd(){const r=document.querySelector('input[name=k]:checked');amt=r.dataset.price;
+document.querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.contains(r)));
+$('t').textContent=$('za').textContent='$'+amt;$('zm').textContent='CheeseTV '+($('u').value.trim()||'<username>');}
+document.querySelectorAll('input[name=k]').forEach(r=>r.onchange=upd);$('u').oninput=upd;
+function cp(t,b){navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1500)});}
+$('ca').onclick=e=>cp(amt,e.target);$('cm').onclick=e=>cp($('zm').textContent,e.target);
+$('f').onsubmit=async e=>{e.preventDefault();const m=$('m');m.className='msg';
+const u=$('u').value.trim(),n=$('n').value.trim(),c=$('c').value.trim();
+if(u.length<2||n.length<2||c.length<5){m.className='msg err';m.textContent='Please fill in your username, name and phone or email.';return}
+$('go').disabled=true;m.textContent='Sending…';
+try{const r=await fetch(SB+'/rest/v1/rpc/submit_renewal',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
+body:JSON.stringify({p_username:u,p_name:n,p_contact:c,p_connections:+document.querySelector('input[name=k]:checked').value})});
+const j=await r.json();if(!r.ok)throw new Error(j.message||'Something went wrong');
+m.className='msg ok';m.textContent='Thanks! Request #'+j.id+' received. We will renew your account once your Zelle payment of $'+j.amount+' arrives.';}
+catch(x){m.className='msg err';m.textContent=x.message+'. Please try again.';$('go').disabled=false}};
+</script></body></html>
