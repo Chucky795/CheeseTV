@@ -76,4 +76,5 @@
 <script>(function(){var b=document.getElementById('fabBtn'),m=document.getElementById('fabMenu');b.onclick=function(e){e.stopPropagation();location.href='http://live.watchcheesetv.com/'};document.addEventListener('click',function(){m.hidden=true;b.setAttribute('aria-expanded','false')});document.getElementById('fabTop').onclick=function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'})};})();</script>
 <div id="dlToast" role="status" aria-live="polite" hidden><button aria-label="Close" onclick="this.parentNode.hidden=true">×</button><span></span></div>
 <script>(function(){var t=document.getElementById('dlToast'),tm;document.querySelectorAll('#download a.dl-card[download]').forEach(function(a){a.addEventListener('click',function(){var mb=/roku/.test(a.href)?'':' (47 MB)';t.querySelector('span').textContent='Downloading CheeseTV'+mb+'… If Chrome asks, tap Download anyway. Then open it from your notifications or Chrome ⋮ › Downloads.';t.hidden=false;clearTimeout(tm);tm=setTimeout(function(){t.hidden=true},15000)})})})();</script>
-<script src="script.js?v=20261022b"></script></body></html>
+<script src="script.js?v=20261022b"></script><script src="assets/chatbot.js" defer></script>
+</body></html>
