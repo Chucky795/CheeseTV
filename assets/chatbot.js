@@ -2,12 +2,12 @@
 (function(){
 if(window.__ctvChat)return;window.__ctvChat=1;
 var SB="https://vrmtxrtzweblakuvkwoe.supabase.co",KEY="sb_publishable_zvptRN1xVVYyt6jP1B-5vA_netcK9Vm";
-var R="https://watchcheesetv.com/renew.html";
+var R="https://watchcheesetv.com/renew.html",SU="https://watchcheesetv.com/signup.html";
 var FAQ=[
-{k:["price","cost","how much","plan","plans","monthly","per month","connections price","cheap"],a:"Plans are month to month:<br>• 1 connection: <b>$14.99/mo</b><br>• 2 connections: <b>$19.99/mo</b><br>• 3 connections: <b>$27.99/mo</b><br>Every plan includes the full channel lineup, on-demand library, TV guide and catch-up. Setup is free."},
+{k:["price","cost","how much","plan","plans","monthly","per month","connections price","cheap"],a:"Plans are month to month:<br>• 1 connection: <b>$14.99/mo</b><br>• 2 connections: <b>$19.99/mo</b><br>• 3 connections: <b>$27.99/mo</b><br>Every plan includes the full channel lineup, on-demand library, TV guide and catch-up. Setup is free. New customers can <a href='"+SU+"'>sign up here</a>."},
 {k:["connection","screens","screen","at once","multiple tv","same time"],a:"A connection is one screen streaming at a time. Choose 2 or 3 connections to watch on several screens at once."},
 {k:["contract","cancel","commitment","pay as you go","month to month"],a:"No contract. It's pay-as-you-go, month to month, and you can cancel anytime."},
-{k:["pay","payment","zelle","send money","how do i pay"],a:"We take payment by <b>Zelle</b> to <b>cheesetv795@gmail.com</b>. Put <i>CheeseTV &lt;your username&gt;</i> in the memo. Returning customers can use the <a href='"+R+"'>Renew page</a>."},
+{k:["pay","payment","zelle","send money","how do i pay"],a:"We take payment by <b>Zelle</b> to <b>cheesetv795@gmail.com</b>. Put <i>CheeseTV &lt;your username&gt;</i> in the memo. New customers: <a href='"+SU+"'>sign up here</a>. Returning customers can use the <a href='"+R+"'>Renew page</a>."},
 {k:["renew","renewal","expired","extend","expire","another month"],a:"Renew here: <a href='"+R+"'>watchcheesetv.com/renew.html</a>. Enter your username, pick your connections, send the amount by Zelle to cheesetv795@gmail.com, then tap <i>I've sent the payment</i>. We renew your account once we confirm the payment."},
 {k:["fire","firestick","fire stick","fire tv","android tv","downloader","google tv","shield"],a:"Fire TV / Android TV: install the <b>Downloader</b> app, open it and type <b>watchcheesetv.com/tv.apk</b>, then tap Install when it finishes."},
 {k:["android phone","android","apk","samsung","phone app","tablet"],a:"Android phone: tap <a href='https://watchcheesetv.com/#download'>Download APK</a>. If Chrome asks, tap <i>Download anyway</i>, open the file from your notifications, allow installs from Chrome if asked, then tap Install."},
@@ -18,7 +18,7 @@ var FAQ=[
 {k:["internet","speed","mbps","buffer","buffering","wifi","lag","freez"],a:"We recommend at least <b>100 Mbps</b> internet for the smoothest HD and 4K streaming, especially with multiple connections."},
 {k:["catch up","catch-up","replay","missed","rewind"],a:"Every plan includes catch-up with 7-day replay and the full TV guide."},
 {k:["4k","hd","quality","resolution"],a:"Plans include HD and 4K streaming."},
-{k:["setup","set up","sign up","start","get started","new customer","subscribe","join","free trial","trial"],a:"Pick a plan and our team will send you simple setup steps for your devices. Setup is free on every plan. To get started, send us your question or email cheesetv795@gmail.com."},
+{k:["setup","set up","sign up","start","get started","new customer","subscribe","join","free trial","trial"],a:"Sign up here: <a href='"+SU+"'>watchcheesetv.com/signup.html</a>. Pick 1, 2 or 3 connections, pay by Zelle, and we email your login and setup steps once your payment is confirmed. Setup is free."},
 {k:["contact","email","support","human","talk","person","help me"],a:"Email us at <b>cheesetv795@gmail.com</b>, or tap <i>Ask CheeseTV</i> below and we'll reply to you."}
 ];
 var CHIPS=[["💲 Prices","How much does it cost?"],["🔄 Renew","How do I renew?"],["🔥 Fire TV","How do I install on Fire TV?"],["📺 Roku","How do I install on Roku?"],["🍏 iPhone / Web","How do I watch on iPhone?"],["⏺ Recording","Can I record shows?"],["✉️ Ask CheeseTV","__ask"]];
