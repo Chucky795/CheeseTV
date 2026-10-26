@@ -254,11 +254,13 @@ function openVlc(u,box,v){if(!u)return;v=v||P.vod;if(v&&v.url===u){v.sid&&noteLa
   const g=box||document.body,h=`<p class="note">Don't have VLC? It's free on the App Store.</p><a class="btn gold" href="${VLC_IOS}" target="_blank" rel="noopener">Get VLC (free)</a>`;
   if(box){box.innerHTML=h}else toast("VLC didn't open. Get VLC (free) from the App Store.",6000),window.open(VLC_IOS,'_blank')},2000)}
 function openPlayer(){if($('#player').hidden)hpush('player');$('#player').hidden=false;$('#pErr').hidden=true;$('#mini').hidden=true;osdShow();if(!$('#player').dataset.k){$('#player').dataset.k=1}}
+// 1.1.23: CheeseTV logo bug (top-right, ~45%) the whole time a live channel plays; hidden while the controls show.
+function wmLive(on){$('#player').classList.toggle('live',!!on)}
 function playChannel(i,list){
  list=list||P.list;if(!list.length)return;i=(i+list.length)%list.length;const c=list[i];P.list=list;P.idx=i;P.vod=null;S.cur=c;
  const r=S.recent[pl().id]=(S.recent[pl().id]||[]).filter(k=>k!==ckey(c));r.unshift(ckey(c));r.length=Math.min(r.length,20);save();
  openPlayer();$('#pName').textContent=(c.num||c.n?`${c.num||c.n}  `:'')+c.name;updFavBtn();$('#pLogo').outerHTML=logo(c,'ologo').replace('class="lg','id="pLogo" class="lg');updNow();
- $('#pRec').hidden=false;$('#pVlc').hidden=true;$('#pChUp').hidden=$('#pChDn').hidden=false;
+ $('#pRec').hidden=false;$('#pVlc').hidden=true;$('#pChUp').hidden=$('#pChDn').hidden=false;wmLive(1);
  const urls=[c.url];if(c.alt)urls.push(c.alt);else if(kind(c.url)==='unknown')urls.push(c.url+'.m3u8');
  urls.sort((a,b)=>(kind(b)==='hls')-(kind(a)==='hls'));start(urls,true);
 }
@@ -389,7 +391,7 @@ async function renderRecs(){renderSched();const L=$('#recList');L.innerHTML='<di
   :`<div class="empty"><div class="rec-ic" style="width:40px;height:40px;color:var(--gold)"></div><p>No recordings yet.<br>Open a channel and tap <b style="color:var(--red)">●</b> Record.</p><p class="note">Recording works when the provider lets web pages fetch its HLS segments (CORS). Otherwise use the CheeseTV Android app.</p></div>`;
  $$('#recList .rec button').forEach(b=>b.onclick=async()=>{const r=recs.find(x=>x.id===b.closest('.rec').dataset.id);
   if(b.dataset.a==='play')playRec(r);else if(b.dataset.a==='del'){if(!confirm('Delete this recording?'))return;await DB.delRec(r.id);await sweep();renderRecs()}else downloadRec(r,b)})}
-function playRec(r){if(r.raw)return playRaw(r);if(!hlsOK()){toast('Playing recordings needs iOS 17.1 or newer (or a desktop browser).',5000);return}
+function playRec(r){wmLive(0);if(r.raw)return playRaw(r);if(!hlsOK()){toast('Playing recordings needs iOS 17.1 or newer (or a desktop browser).',5000);return}
  Local.recs[r.id]={tracks:r.tracks,inf:r.inf,ended:true};P.vod={key:'rec:'+r.id,rec:true};P.list=[];openPlayer();$('#pName').textContent=r.title;$('#pNow').textContent=`Recorded from ${r.chan}`;
  $('#pLogo').outerHTML=logo({name:r.chan,logo:r.logo},'ologo').replace('class="lg','id="pLogo" class="lg');$('#pRec').hidden=$('#pChUp').hidden=$('#pChDn').hidden=true;
  const tok=++P.token;teardown();spin(true);tryHls(`${LOC}rec/${r.id}/master.m3u8`,true,tok).then(ok=>{if(ok)setMode('vod');else showErr("This recording can't play",'Part of the recording is missing from this device.',P.lastErr?.d)})}
@@ -487,7 +489,7 @@ async function playEngine(v,at){const tok=++P.token;teardown();$('#pRec').hidden
  try{P.eng=await E.open(V,v.url,{start:at||0,ctx:P.actx,onStatus:t=>{if(tok===P.token){if(t){spin(true);status(t)}else spin(false)}},
   onError:e=>{if(tok===P.token){teardown();showErr("This movie couldn't play in the browser",'The beta player failed. Try again, or watch it in the CheeseTV app.',redact(String(e&&e.message||e))+` · ${v.fmt.label}`)}}});
   if(tok!==P.token){P.eng.destroy();return}V.play().catch(()=>{})}catch(e){if(tok===P.token)showErr("This movie couldn't play in the browser",'Try again, or watch it in the CheeseTV app.',String(e))}}
-function playVod(v,at){P.vod=v;setTimeout(updFavBtn);v.sid&&noteLast(v);$('#pVlc').hidden=!v.url;P.list=[];P.vodStart=at||0;openPlayer();$('#pName').textContent=v.name;$('#pNow').textContent=v.type==='movie'?'Movie':'Series';
+function playVod(v,at){wmLive(0);P.vod=v;setTimeout(updFavBtn);v.sid&&noteLast(v);$('#pVlc').hidden=!v.url;P.list=[];P.vodStart=at||0;openPlayer();$('#pName').textContent=v.name;$('#pNow').textContent=v.type==='movie'?'Movie':'Series';
  if(v.fmt&&!v.fmt.ok&&v.fmt.eng){playEngine(v,at);return}
  if(v.fmt&&!v.fmt.ok){++P.token;teardown();$('#pRec').hidden=$('#pChUp').hidden=$('#pChDn').hidden=true;fmtBlockErr(v);return}
  $('#pLogo').outerHTML=`<div id="pLogo" class="lg ologo" style="${v.img?`background-image:url('${esc(v.img)}');background-size:cover`:''}"></div>`;$('#pRec').hidden=$('#pChUp').hidden=$('#pChDn').hidden=true;
@@ -787,7 +789,7 @@ async function tsRecord(c,pend){const tsu=[c.url,c.alt].find(u=>u&&kind(u)==='ts
   if(P.tsrec===ac&&!ac.signal.aborted){await sleep(1500)} // stream ended: reconnect
  }
  if(P.tsrec===ac){P.tsrec=null;stopRecording()}}
-async function playRaw(r){openPlayer();$('#pName').textContent=r.title;$('#pNow').textContent=`Recorded from ${r.chan}`;$('#pRec').hidden=$('#pChUp').hidden=$('#pChDn').hidden=true;P.vod={key:'rec:'+r.id,rec:true};P.list=[];
+async function playRaw(r){wmLive(0);openPlayer();$('#pName').textContent=r.title;$('#pNow').textContent=`Recorded from ${r.chan}`;$('#pRec').hidden=$('#pChUp').hidden=$('#pChDn').hidden=true;P.vod={key:'rec:'+r.id,rec:true};P.list=[];
  const tok=++P.token;teardown();spin(true);const parts=[];for(const s of r.tracks.main.segs)parts.push(await DB.get(s.k));const url=URL.createObjectURL(new Blob(parts,{type:'video/mp2t'}));
  if(!window.mpegts){showErr("This recording can't play here",'Download it and open it in VLC.');return}
  const p=P.ts=mpegts.createPlayer({type:'mpegts',isLive:false,url});const w=waitPlaying(tok);p.attachMediaElement(V);p.load();V.play().catch(()=>{});if(await w)setMode('vod');else showErr("This recording can't play here",'Download it and open it in VLC.')}
