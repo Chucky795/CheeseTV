@@ -254,8 +254,9 @@ function openVlc(u,box,v){if(!u)return;v=v||P.vod;if(v&&v.url===u){v.sid&&noteLa
   const g=box||document.body,h=`<p class="note">Don't have VLC? It's free on the App Store.</p><a class="btn gold" href="${VLC_IOS}" target="_blank" rel="noopener">Get VLC (free)</a>`;
   if(box){box.innerHTML=h}else toast("VLC didn't open. Get VLC (free) from the App Store.",6000),window.open(VLC_IOS,'_blank')},2000)}
 function openPlayer(){if($('#player').hidden)hpush('player');$('#player').hidden=false;$('#pErr').hidden=true;$('#mini').hidden=true;osdShow();if(!$('#player').dataset.k){$('#player').dataset.k=1}}
-// 1.1.23: CheeseTV logo bug (top-right, ~45%) the whole time a live channel plays; hidden while the controls show.
-function wmLive(on){$('#player').classList.toggle('live',!!on)}
+// 1.1.23: CheeseTV logo bug (top-right, ~45%) for 45 s from each live channel start/switch, then fades out (1 s).
+// The controls may hide it meanwhile; the 45 s keeps counting from the channel start.
+let wmT=0;function wmLive(on){const p=$('#player');clearTimeout(wmT);p.classList.toggle('live',!!on);p.classList.toggle('wmon',!!on);if(on)wmT=setTimeout(()=>p.classList.remove('wmon'),45000)}
 function playChannel(i,list){
  list=list||P.list;if(!list.length)return;i=(i+list.length)%list.length;const c=list[i];P.list=list;P.idx=i;P.vod=null;S.cur=c;
  const r=S.recent[pl().id]=(S.recent[pl().id]||[]).filter(k=>k!==ckey(c));r.unshift(ckey(c));r.length=Math.min(r.length,20);save();
