@@ -54,4 +54,4 @@ const j=await r.json();if(!r.ok)throw new Error(j.message||'Something went wrong
 m.className='msg ok';m.textContent='Thanks! Request #'+j.id+' received. We will renew your account once your Zelle payment of $'+j.amount+' arrives.';}
 catch(x){m.className='msg err';m.textContent=x.message+'. Please try again.';$('go').disabled=false}};
 </script><script src="assets/chatbot.js" defer></script>
-</body></html>
+<script src="/assets/visit.js" defer></script></body></html>
