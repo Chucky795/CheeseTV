@@ -1,0 +1,50 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free 12-hour trial | CheeseTV</title>
+<link rel="stylesheet" href="styles.css?v=20261025a"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<style>
+.rn{max-width:520px;margin:auto;padding:2rem 0 4rem}.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:20px;padding:1.4rem;margin-top:1.2rem}
+label{display:block;font-weight:600;font-size:.9rem;margin:.9rem 0 .3rem}input,select{width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);background:#060c1c;color:var(--tx);font-size:1rem}
+input:focus,select:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6rem;margin-top:.4rem}
+.opt{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1rem;border:1px solid var(--line);border-radius:14px;cursor:pointer;font-weight:600}
+.opt input{width:auto;margin-right:.6rem;accent-color:var(--gold)}.opt.on{border:2px solid var(--gold);background:rgba(240,165,0,.08)}.opt b{color:var(--gold2)}
+.total{display:flex;justify-content:space-between;font-size:1.3rem;font-weight:800;margin-top:1rem}.total b{color:var(--gold)}
+.nc{color:var(--gold2);font-weight:600;font-size:.9rem;margin-top:.4rem}.zl{line-height:1.7}.zl code{background:#060c1c;padding:.15rem .45rem;border-radius:6px;color:var(--gold2)}
+.cp{display:flex;gap:.5rem;margin-top:.8rem}.cp .btn{flex:1;text-align:center}.msg{margin-top:1rem;font-weight:600}.err{color:#ff7a7a}.ok{color:#7dffa8}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}textarea{width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);background:#060c1c;color:var(--tx);font-size:1rem}
+</style></head><body>
+<header class="nav"><div class="wrap nav-in"><a class="logo" href="/">🧀 Cheese<span>TV</span></a><a class="btn sm ghost" href="/">Home</a></div></header>
+<main class="wrap rn">
+<p class="eyebrow">Try before you buy</p><h2>Free 12-hour trial</h2>
+<p class="sub" style="margin-bottom:0">Tell us how to reach you and we'll send a free 12-hour trial login. No payment needed.</p>
+<form id="f" class="card" novalidate>
+<label for="n">Your name</label><input id="n" autocomplete="name" required maxlength="80">
+<label for="e">Email</label><input id="e" type="email" autocomplete="email" maxlength="120">
+<label for="p">Phone</label><input id="p" type="tel" autocomplete="tel" maxlength="30">
+<p class="nc" style="font-weight:500">Enter an email, a phone number, or both.</p>
+<label for="d">What will you watch on? (optional)</label><select id="d"><option value="">Choose a device</option>
+<option>Android phone or tablet</option><option>Android TV / Google TV</option><option>Fire TV / Firestick</option><option>Roku</option><option>Octastream / Android box</option><option>iPhone / iPad</option><option>Computer (web player)</option><option>LG TV</option><option>Other</option></select>
+<label for="t">Note (optional)</label><textarea id="t" rows="3" maxlength="500" placeholder="Anything we should know?"></textarea>
+<div class="hp" aria-hidden="true"><label for="w">Website</label><input id="w" tabindex="-1" autocomplete="off"></div>
+<button class="btn lg block" style="margin-top:1.4rem" id="go">Request my free trial</button>
+<p class="msg" id="m" role="status"></p>
+<p class="nc" style="font-weight:500">One free trial per person. Want the full service now? <a href="/signup.html">Sign up here</a>.</p>
+</form>
+<div class="card" id="done" hidden><h3>Thanks! 🎉</h3><p class="zl">Your request is in. Steve will check it and send your 12-hour trial login shortly.</p><a class="btn ghost" href="/">Back to home</a></div>
+</main>
+<script>
+const SB="https://vrmtxrtzweblakuvkwoe.supabase.co",KEY="sb_publishable_zvptRN1xVVYyt6jP1B-5vA_netcK9Vm";
+const $=id=>document.getElementById(id);
+$('f').onsubmit=async e=>{e.preventDefault();const m=$('m');m.className='msg';
+const n=$('n').value.trim(),em=$('e').value.trim(),p=$('p').value.trim();
+if(n.length<2){m.className='msg err';m.textContent='Please enter your name.';return}
+if(!em&&!p){m.className='msg err';m.textContent='Please enter your email or phone.';return}
+if(em&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){m.className='msg err';m.textContent='Please enter a valid email.';return}
+$('go').disabled=true;m.textContent='Sending…';
+try{const r=await fetch(SB+'/rest/v1/rpc/submit_trial_request',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
+body:JSON.stringify({p_name:n,p_email:em||null,p_phone:p||null,p_device:$('d').value||null,p_note:$('t').value.trim()||null,p_website:$('w').value||null})});
+const j=await r.json();if(!r.ok)throw new Error(j.message||'Something went wrong');
+if(j.duplicate){m.className='msg err';m.innerHTML='A free trial was already requested with this email or phone. Questions? Use the chat or the <a href="/#contact">contact form</a> and we\'ll help.';$('go').disabled=false;return}
+$('f').hidden=true;$('done').hidden=false;$('done').scrollIntoView({behavior:'smooth'});}
+catch(x){m.className='msg err';m.textContent=x.message+'. Please try again.';$('go').disabled=false}};
+</script><script src="assets/chatbot.js?v=20261028t" defer></script>
+<script src="/assets/visit.js" defer></script></body></html>
