@@ -712,14 +712,16 @@ function progMenu(c,p,list,i){const on=schedHas(c,p),fav=favSet().has(ckey(c));
  <p style="margin:0 0 4px"><b>${esc(c.name)}</b> · ${new Date(p.a).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'})} – ${hm(p.b)}</p>
  <div style="display:grid;gap:8px;margin:12px 0">
   <button class="btn ${on?'dark':'gold'}" id="pmRec">${on?'✕ Cancel recording':'⏺ Record this show'}</button>
+  ${c.id&&p.b>Date.now()?'<button class="btn dark" id="pmTv">📺 Record on my TV</button>':''}
   <button class="btn dark" id="pmFav">${fav?'★ Remove from Favorites':'☆ Add to Favorites'}</button>
   <button class="btn dark" id="pmWatch">▶ Watch channel now</button></div>
  <p class="note">Web recording runs only while this tab stays open and the screen stays on. It starts 2 min early, ends 5 min late, and the file downloads from Recordings when it's done. For reliable recordings (screen off, app closed) use the <a href="https://watchcheesetv.com/#devices">CheeseTV Android / Fire TV app</a>.</p>`);
  $('#pmRec').onclick=()=>{let l=schedAll();if(on){l=l.filter(x=>x.id!==schedId(c,p));toast('Recording cancelled')}else{if(!confirm('Keep this tab open and the screen on until the show ends. Closing it cancels the recording.\n\nFor background recording use the CheeseTV Android / Fire TV app.\n\nSchedule this recording?'))return;l.push({id:schedId(c,p),k:ckey(c),chan:c.name,title:p.t||c.name,a:p.a,b:p.b,pl:pl()?.id});toast(`⏺ "${p.t}" will record at ${hm(p.a)}. Keep this tab open.`,6000);try{Notification?.permission==='default'&&Notification.requestPermission()}catch(e){}}
   schedSave(l.sort((x,y)=>x.a-y.a));uiBack(closeSheet);renderGuide()};
  $('#pmFav').onclick=()=>{favToast(toggleFav(c),c);uiBack(closeSheet);renderGuide()};
+ const tvb=$('#pmTv');if(tvb)tvb.onclick=()=>{uiBack(closeSheet);setTimeout(()=>tvRecMenu(c,p),50)};
  $('#pmWatch').onclick=()=>{uiBack(closeSheet);playChannel(i,list)}}
-function renderSched(){let box=$('#schedList');if(!box){box=document.createElement('div');box.id='schedList';$('#recList').before(box)}
+function renderSched(){renderTvRecs();let box=$('#schedList');if(!box){box=document.createElement('div');box.id='schedList';$('#recList').before(box)}
  const l=schedAll().filter(x=>x.b+POST>Date.now());
  const lg=recLogAll();box.innerHTML=(lg.length?`<h4 style="margin:8px 0">Didn't record</h4>`+lg.map(x=>`<div class="rec recfail" data-lid="${esc(x.lid)}"><div><b style="color:var(--red)">${x.status==='missed'?'⚠ Missed':'✕ Failed'}: ${esc(x.title)}</b><small>${esc(x.chan||'')}${x.a?' · '+new Date(x.a).toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):''}</small><small>${esc(x.msg)}</small></div><button class="btn dark" data-a="dismiss">Dismiss</button></div>`).join(''):'')+`<p class="note">⏺ Scheduled shows record only while this tab is open and the screen stays on (CheeseTV keeps it awake). Your plan allows 1 connection, so at start time CheeseTV switches to that channel. For reliable recordings use the CheeseTV Android / Fire TV app.</p>`+
   (l.length?`<h4 style="margin:8px 0">Scheduled</h4>`+l.map(x=>`<div class="rec" data-sid="${esc(x.id)}"><div><b>⏺ ${esc(x.title)}</b><small>${esc(x.chan)} · ${new Date(x.a).toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} – ${hm(x.b)}${x.fired?' · recording now':' · <b style="color:var(--gold)">Scheduled</b>'}</small></div><button class="btn dark" data-a="cancel">Cancel</button></div>`).join('')+`<h4 style="margin:12px 0 8px">Recorded</h4>`:'');
@@ -793,3 +795,34 @@ async function playRaw(r){wmLive(0);openPlayer();$('#pName').textContent=r.title
  const tok=++P.token;teardown();spin(true);const parts=[];for(const s of r.tracks.main.segs)parts.push(await DB.get(s.k));const url=URL.createObjectURL(new Blob(parts,{type:'video/mp2t'}));
  if(!window.mpegts){showErr("This recording can't play here",'Download it and open it in VLC.');return}
  const p=P.ts=mpegts.createPlayer({type:'mpegts',isLive:false,url});const w=waitPlaying(tok);p.attachMediaElement(V);p.load();V.play().catch(()=>{});if(await w)setMode('vod');else showErr("This recording can't play here",'Download it and open it in VLC.')}
+
+// ---------------------------------------------------------------- v26: Record on my TV (1.1.28 app)
+// The request goes to the account (sha256 key, as for favorites), any CheeseTV TV app signed in to
+// the same login claims it and records it locally. Only titles, times and the channel's stream id
+// leave the browser; the video stays on the TV. Your plan allows 1 connection: overlaps are refused.
+const TVST={sent:'Sent, waiting for your TV',claimed:'Your TV picked it up',recording:'● Recording on your TV',done:'✓ Done, ready on your TV',failed:'✕ Failed',conflict:'⚠ Conflict',cancelled:'Cancelled'};
+async function tvRequest(c,title,a,b,now){const key=await sKey();if(!key){toast('Sign in with your CheeseTV (Xtream) login to record on your TV.',5000);return}
+ const r=await rpc('sync_remote_record',{p_key:key,p_item_id:String(c.id).replace(/^x/,''),p_channel_title:String(c.name||'').slice(0,300),p_title:String(title||c.name||'').slice(0,300),p_kind:now?'now':'scheduled',p_start:new Date(a).toISOString(),p_end:new Date(b).toISOString(),p_origin:'web'});
+ if(!r||r.bad){toast("Couldn't reach CheeseTV. Check your internet and try again.",5000);return}
+ if(!r.ok){alert('⚠ '+(r.message||'Another recording is already set for that time.')+'\n\nOnly one show can record at a time. Cancel the other one in Recordings first.');return}
+ toast((r.tvs===0?'Sent, but no TV is signed in to this account yet. Open CheeseTV on your TV with the same login.':r.tvs_online===0?"Sent, but your TV hasn't checked in for a while. Make sure it's on and online.":'📺 Sent to your TV.')+' Watching live elsewhere while it records may fail (1 connection).',8000);
+ renderTvRecs()}
+function tvRecMenu(c,p){const now=Date.now(),air=p?p.a<=now:true,title=p?.t||c.name,end=p?.b;
+ const opts=air?[[end&&end>now?'Until the show ends ('+hm(end)+')':null,end],['30 min',now+18e5],['1 hour',now+36e5],['2 hours',now+72e5]].filter(o=>o[0]):[['Record this show ('+hm(p.a)+' – '+hm(p.b)+')',p.b]];
+ sheet(`<div class="shd"><h3>📺 Record on my TV</h3><button class="ic" onclick="uiBack(closeSheet)">&#10005;</button></div>
+ <p style="margin:0 0 4px"><b>${esc(title)}</b> · ${esc(c.name)}</p><div style="display:grid;gap:8px;margin:12px 0">${opts.map((o,i)=>`<button class="btn ${i?'dark':'gold'}" data-i="${i}">⏺ ${esc(o[0])}</button>`).join('')}</div>
+ <p class="note">Your TV at home records it with the CheeseTV app (signed in to the same login), even from standby. The video stays on the TV; watch it in the TV's DVR tab. Your service allows 1 connection, so watching live on another device while it records may fail.</p>`);
+ $$('.sheet [data-i], #sheet [data-i]').forEach(b=>b.onclick=()=>{const o=opts[+b.dataset.i];uiBack(closeSheet);tvRequest(c,title,air?Date.now():p.a,o[1],air)})}
+async function renderTvRecs(){let box=$('#tvRecs');if(!box){box=document.createElement('div');box.id='tvRecs';$('#recList').before(box)}
+ const key=await sKey();if(!key){box.innerHTML='';return}const r=await rpc('sync_get_remote',{p_key:key});if(!r||r.bad){box.innerHTML='';return}
+ const tvs=(r.devices||[]).filter(d=>d.kind==='tv'),on=tvs.filter(d=>d.online);
+ const warn=!tvs.length?'No TV is signed in to this account yet. Open CheeseTV on your TV with the same login to record there.':!on.length?"Your TV hasn't checked in for a while. Make sure it's plugged in and online.":'';
+ const jobs=(r.jobs||[]).filter(j=>['sent','claimed','recording','failed','conflict'].includes(j.status));
+ const dt=x=>x?new Date(x).toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';
+ box.innerHTML=`<h4 style="margin:8px 0">📺 My recordings (all devices)</h4>`+(warn?`<p class="note" style="color:var(--gold)">${esc(warn)}</p>`:`<p class="note">TVs online: ${on.map(d=>esc(d.name||'TV')).join(', ')}</p>`)+
+  jobs.map(j=>`<div class="rec" data-jid="${esc(j.job_id)}"><div><b>${esc(j.title)}</b><small>${esc(j.channel_title||'')} · ${dt(j.start_at)} – ${hm(Date.parse(j.end_at))}</small><small>${esc(TVST[j.status]||j.status)}${j.message?' · '+esc(j.message):''}</small></div>${['sent','claimed','recording'].includes(j.status)?'<button class="btn dark" data-a="tvcancel">Cancel</button>':''}</div>`).join('')+
+  (r.dvr||[]).map(e=>`<div class="rec"><div><b>${esc(e.title||'Recording')}</b><small>${esc(e.channel_title||'')}${e.start_at?' · '+dt(e.start_at):''}${e.size_bytes?' · '+(e.size_bytes/1e6).toFixed(0)+' MB':''}</small><small>${e.status==='recording'?'● Recording':e.status==='failed'?'✕ Incomplete':'✓ Ready'} on <b>${esc(e.device_name||'a device')}</b> · plays on that device only</small></div></div>`).join('')+
+  (!jobs.length&&!(r.dvr||[]).length?'<p class="note">Nothing yet. In the Guide, tap a show and choose 📺 Record on my TV.</p>':'');
+ box.querySelectorAll('[data-a=tvcancel]').forEach(b=>b.onclick=async()=>{await rpc('sync_update_remote',{p_key:key,p_job_id:b.closest('.rec').dataset.jid,p_device_id:null,p_status:'cancelled'});toast('Cancelled');renderTvRecs()})}
+document.addEventListener('click',e=>{if(!e.target.closest?.('#pTvRec'))return;const c=S.cur;if(!c||P.vod){toast('Open a live channel first.');return}
+ if(!c.id){toast("This channel can't be sent to your TV (no channel id).");return}const n=Date.now();let p=null;try{p=progs(c).find(x=>x.a<=n&&x.b>n)||null}catch(_){}tvRecMenu(c,p)});
