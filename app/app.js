@@ -643,7 +643,7 @@ function goHttp(p){let url=HTTP_COPY;if(p.type==='xt'){const q=new URLSearchPara
 })();
 
 /* ---------- version check + Update banner (v28) ---------- */
-const APPV=28;
+const APPV=29;
 async function hardUpdate(){try{if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()))}
  if(window.caches){const k=await caches.keys();await Promise.all(k.map(x=>caches.delete(x)))}}catch(e){}
  const u=new URL(location.href);u.searchParams.set('v',Date.now());location.replace(u.href)}
@@ -652,8 +652,12 @@ function showUpd(v){let d=$('#updBar');if(!d){d=document.createElement('div');d.
  d.innerHTML='<span>🧀 Update available</span><button class="btn gold" id="updGo">Update now</button><button class="btn dark" id="updNo" aria-label="Later">Later</button>';document.body.appendChild(d);
  $('#updGo').onclick=()=>{if(recBusy()&&!confirm('A recording is running in this tab. Update anyway?'))return;hardUpdate()};$('#updNo').onclick=()=>{sessionStorage.setItem('ctv.updNo',String(v));d.hidden=true}}
  d.hidden=false}
+// v29: auto-apply when idle (nothing playing or recording); otherwise wait, banner stays as fallback.
+let updPend=0;const updIdle=()=>{try{return !recBusy()&&($('#player').hidden||V.paused||V.ended)}catch(e){return false}};
+function tryAuto(){if(!updPend||!updIdle())return;if(sessionStorage.getItem('ctv.auto')===String(updPend))return;sessionStorage.setItem('ctv.auto',String(updPend));hardUpdate()}
 async function verCheck(){try{const r=await fetch('/version.json?n='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=+(await r.json()).web;
- if(v>APPV&&sessionStorage.getItem('ctv.updNo')!==String(v))showUpd(v)}catch(e){}}
+ if(v>APPV){updPend=v;if(sessionStorage.getItem('ctv.updNo')!==String(v))showUpd(v);tryAuto()}}catch(e){}}
+setInterval(tryAuto,20000);V.addEventListener('pause',()=>setTimeout(tryAuto,1500));V.addEventListener('emptied',()=>setTimeout(tryAuto,1500));
 verCheck();setInterval(verCheck,30*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)verCheck()});
 if('serviceWorker' in navigator)navigator.serviceWorker.getRegistration('/app/').then(r=>r&&r.update()).catch(()=>{});
 /* ---------- Back button: in-app history (v17, v18: gesture-armed guard) ---------- */

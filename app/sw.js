@@ -1,4 +1,4 @@
-const C='cheesetv-app-v28',A=['/app/','/app/index.html','/app/app.css','/app/app.js','/app/manifest.webmanifest','/app/vendor/hls.min.js','/app/vendor/mpegts.js','/icons/icon-192.png','/icons/apple-touch-icon.png','/assets/logo-112.png','/assets/cheesetv-wm.png'];
+const C='cheesetv-app-v29',A=['/app/','/app/index.html','/app/app.css','/app/app.js','/app/manifest.webmanifest','/app/vendor/hls.min.js','/app/vendor/mpegts.js','/icons/icon-192.png','/icons/apple-touch-icon.png','/assets/logo-112.png','/assets/cheesetv-wm.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)));self.skipWaiting()});
 self.addEventListener('message',e=>{if(e.data==='skip')self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith('cheesetv-app')&&x!==C).map(x=>caches.delete(x)))));self.clients.claim()});
