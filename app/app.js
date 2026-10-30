@@ -616,7 +616,7 @@ $('#fM3u').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),m=$('#
   let n;try{n=normXt(url,'','')}catch(x){m.className='msg e';m.textContent=x.message;return}addPl({type:'xt',name:new URL(n.server).hostname,server:n.server,user:n.user,pass:n.pass},e.target);return}
  addPl({type:'m3u',name:(f.get('name')||'').trim()||'My playlist',url,epg:(f.get('epg')||'').trim()},e.target)};
 setInterval(()=>{if(!$('#shell').hidden&&$('#player').hidden&&S.view==='guide')renderGuide();updNow()},60000);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('/app/sw.js',{scope:'/app/'}).catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/app/sw.js',{scope:'/app/',updateViaCache:'none'}).catch(()=>{});
 navigator.storage?.persist?.().catch(()=>{});
 sweep();loadActive();
 (()=>{const q=new URLSearchParams(location.search),sv=q.get('server'),us=q.get('user');if(!sv&&!us)return;
@@ -642,11 +642,20 @@ function goHttp(p){let url=HTTP_COPY;if(p.type==='xt'){const q=new URLSearchPara
  V.addEventListener('playing',()=>{ws=0;clearTimeout(tm)});
 })();
 
-/* ---------- version + stale-cache check (v18) ---------- */
-const APPV=23;
-async function verCheck(){try{const r=await fetch('/app/version.json?n='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=+(await r.json()).v;
- if(v>APPV&&!recBusy()&&sessionStorage.getItem('ctv.vr')!==String(v)){sessionStorage.setItem('ctv.vr',String(v));const u=new URL(location.href);u.searchParams.set('v',v);location.replace(u.href)}}catch(e){}}
-verCheck();document.addEventListener('visibilitychange',()=>{if(!document.hidden&&$('#player').hidden)verCheck()});
+/* ---------- version check + Update banner (v28) ---------- */
+const APPV=28;
+async function hardUpdate(){try{if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()))}
+ if(window.caches){const k=await caches.keys();await Promise.all(k.map(x=>caches.delete(x)))}}catch(e){}
+ const u=new URL(location.href);u.searchParams.set('v',Date.now());location.replace(u.href)}
+function showUpd(v){let d=$('#updBar');if(!d){d=document.createElement('div');d.id='updBar';d.setAttribute('role','status');
+ d.style.cssText='position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:99999;background:#1b1b20;color:#fff;border:1px solid #ffd76a;border-radius:14px;padding:10px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 24px #0008;max-width:94vw;font:600 15px system-ui';
+ d.innerHTML='<span>🧀 Update available</span><button class="btn gold" id="updGo">Update now</button><button class="btn dark" id="updNo" aria-label="Later">Later</button>';document.body.appendChild(d);
+ $('#updGo').onclick=()=>{if(recBusy()&&!confirm('A recording is running in this tab. Update anyway?'))return;hardUpdate()};$('#updNo').onclick=()=>{sessionStorage.setItem('ctv.updNo',String(v));d.hidden=true}}
+ d.hidden=false}
+async function verCheck(){try{const r=await fetch('/version.json?n='+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=+(await r.json()).web;
+ if(v>APPV&&sessionStorage.getItem('ctv.updNo')!==String(v))showUpd(v)}catch(e){}}
+verCheck();setInterval(verCheck,30*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)verCheck()});
+if('serviceWorker' in navigator)navigator.serviceWorker.getRegistration('/app/').then(r=>r&&r.update()).catch(()=>{});
 /* ---------- Back button: in-app history (v17, v18: gesture-armed guard) ---------- */
 function hpush(n){hArm();try{history.pushState({ctv:n==='tab'?'tab':'L',n},'')}catch(e){}}
 // on-screen close buttons: go through history when the layer has its own entry, so the stack stays in step
