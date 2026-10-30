@@ -371,7 +371,13 @@ $('#pMini').onclick=()=>{const m=$('#mini');if(!m.hidden){uiBack(()=>m.hidden=tr
 const recDur=r=>(r.tracks.main?.segs||[]).reduce((a,s)=>a+s.d,0);
 $('#pFavC').onclick=e=>{e.stopPropagation();const c=S.cur;if(c&&!P.vod){favToast(toggleFav(c),c)}};
 $('#pVlc').onclick=()=>{P.vod&&openVlc(P.vod.url)};
-$('#pRec').onclick=()=>{if(P.recording){stopRecording();return}
+// v27: ask where to save before a live recording; the TV option uses no storage on this device.
+$('#pRec').onclick=()=>{if(P.recording){stopRecording();return}const sc=S.cur;if(sc&&sc.id&&!P.vod&&!P.skipWhere){
+ sheet(`<div class="shd"><h3>Where to save?</h3><button class="ic" onclick="uiBack(closeSheet)">&#10005;</button></div><div style="display:grid;gap:8px;margin:12px 0">
+ <button class="btn gold" id="swTv">📺 Save on my TV (recommended)</button><button class="btn dark" id="swHere">⏺ Save on this device</button></div>
+ <p class="note">"Save on my TV" records on your TV at home (CheeseTV app, same login) and uses no storage on this phone, tablet or computer. "Save on this device" stores the video in this browser and only records while this tab stays open. One connection: only one recording at a time.</p>`);
+ $('#swTv').onclick=()=>{uiBack(closeSheet);const n=Date.now();let p=null;try{p=progs(sc).find(x=>x.a<=n&&x.b>n)||null}catch(_){}setTimeout(()=>tvRecMenu(sc,p),50)};
+ $('#swHere').onclick=()=>{uiBack(closeSheet);P.skipWhere=true;try{$('#pRec').click()}finally{P.skipWhere=false}};return}
  if((P.mode==='buffer'||P.mode==='ts')&&hlsOK()&&!P.vod&&!P.wantShift){P.wantShift=true;P.recAfter=true;toast('Switching to pause & rewind mode to record…');playChannel(P.idx,P.list);return}
  if(P.mode==='ts'&&!P.vod&&S.cur){if(confirm('Your plan allows 1 connection, so CheeseTV records this channel without showing the video (direct .ts). Tap Stop to finish. Record now?'))tsRecord(S.cur,null);return}
  if(P.mode!=='shift'||!P.rec){toast(P.mode==='native'?"Recording isn't available in the iPhone's built-in player (AirPlay mode).":"This channel can't be recorded in a browser: the provider doesn't allow web access to the stream segments (CORS). Use the CheeseTV Android app to record.",6000);return}
@@ -711,8 +717,8 @@ function progMenu(c,p,list,i){const on=schedHas(c,p),fav=favSet().has(ckey(c));
  sheet(`<div class="shd"><h3>${esc(p.t)}</h3><button class="ic" onclick="uiBack(closeSheet)">&#10005;</button></div>
  <p style="margin:0 0 4px"><b>${esc(c.name)}</b> · ${new Date(p.a).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'})} – ${hm(p.b)}</p>
  <div style="display:grid;gap:8px;margin:12px 0">
-  <button class="btn ${on?'dark':'gold'}" id="pmRec">${on?'✕ Cancel recording':'⏺ Record this show'}</button>
-  ${c.id&&p.b>Date.now()?'<button class="btn dark" id="pmTv">📺 Record on my TV</button>':''}
+  ${!on&&c.id&&p.b>Date.now()?'<p class="note" style="margin:0">Where should it be saved?</p><button class="btn gold" id="pmTv">📺 Save on my TV (recommended) · uses no storage on this device</button>':''}
+  <button class="btn ${on||c.id?'dark':'gold'}" id="pmRec">${on?'✕ Cancel recording':c.id?'⏺ Save on this device (this browser tab)':'⏺ Record this show'}</button>
   <button class="btn dark" id="pmFav">${fav?'★ Remove from Favorites':'☆ Add to Favorites'}</button>
   <button class="btn dark" id="pmWatch">▶ Watch channel now</button></div>
  <p class="note">Web recording runs only while this tab stays open and the screen stays on. It starts 2 min early, ends 5 min late, and the file downloads from Recordings when it's done. For reliable recordings (screen off, app closed) use the <a href="https://watchcheesetv.com/#devices">CheeseTV Android / Fire TV app</a>.</p>`);
@@ -811,7 +817,7 @@ function tvRecMenu(c,p){const now=Date.now(),air=p?p.a<=now:true,title=p?.t||c.n
  const opts=air?[[end&&end>now?'Until the show ends ('+hm(end)+')':null,end],['30 min',now+18e5],['1 hour',now+36e5],['2 hours',now+72e5]].filter(o=>o[0]):[['Record this show ('+hm(p.a)+' – '+hm(p.b)+')',p.b]];
  sheet(`<div class="shd"><h3>📺 Record on my TV</h3><button class="ic" onclick="uiBack(closeSheet)">&#10005;</button></div>
  <p style="margin:0 0 4px"><b>${esc(title)}</b> · ${esc(c.name)}</p><div style="display:grid;gap:8px;margin:12px 0">${opts.map((o,i)=>`<button class="btn ${i?'dark':'gold'}" data-i="${i}">⏺ ${esc(o[0])}</button>`).join('')}</div>
- <p class="note">Your TV at home records it with the CheeseTV app (signed in to the same login), even from standby. The video stays on the TV; watch it in the TV's DVR tab. Your service allows 1 connection, so watching live on another device while it records may fail.</p>`);
+ <p class="note">Saves on your TV, not on this device: no storage is used here. Your TV at home records it with the CheeseTV app (signed in to the same login), even from standby. The video stays on the TV; watch it in the TV's DVR tab. Your service allows 1 connection, so watching live on another device while it records may fail.</p>`);
  $$('.sheet [data-i], #sheet [data-i]').forEach(b=>b.onclick=()=>{const o=opts[+b.dataset.i];uiBack(closeSheet);tvRequest(c,title,air?Date.now():p.a,o[1],air)})}
 async function renderTvRecs(){let box=$('#tvRecs');if(!box){box=document.createElement('div');box.id='tvRecs';$('#recList').before(box)}
  const key=await sKey();if(!key){box.innerHTML='';return}const r=await rpc('sync_get_remote',{p_key:key});if(!r||r.bad){box.innerHTML='';return}
