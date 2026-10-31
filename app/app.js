@@ -643,7 +643,7 @@ function goHttp(p){let url=HTTP_COPY;if(p.type==='xt'){const q=new URLSearchPara
 })();
 
 /* ---------- version check + Update banner (v28) ---------- */
-const APPV=29;
+const APPV=30;
 async function hardUpdate(){try{if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()))}
  if(window.caches){const k=await caches.keys();await Promise.all(k.map(x=>caches.delete(x)))}}catch(e){}
  const u=new URL(location.href);u.searchParams.set('v',Date.now());location.replace(u.href)}
@@ -734,7 +734,7 @@ function progMenu(c,p,list,i){const on=schedHas(c,p),fav=favSet().has(ckey(c));
   <button class="btn ${on||c.id?'dark':'gold'}" id="pmRec">${on?'✕ Cancel recording':c.id?'⏺ Save on this device (this browser tab)':'⏺ Record this show'}</button>
   <button class="btn dark" id="pmFav">${fav?'★ Remove from Favorites':'☆ Add to Favorites'}</button>
   <button class="btn dark" id="pmWatch">▶ Watch channel now</button></div>
- <p class="note">Web recording runs only while this tab stays open and the screen stays on. It starts 2 min early, ends 5 min late, and the file downloads from Recordings when it's done. For reliable recordings (screen off, app closed) use the <a href="https://watchcheesetv.com/#devices">CheeseTV Android / Fire TV app</a>.</p>`);
+ <p class="note">${c.id?'"Save on my TV" records on your TV at home (CheeseTV app, same login) and uses no storage on this device. "Save on this device": ':''}Web recording runs only while this tab stays open and the screen stays on. It starts 2 min early, ends 5 min late, and the file downloads from Recordings when it's done. For reliable recordings (screen off, app closed) use the <a href="https://watchcheesetv.com/#devices">CheeseTV Android / Fire TV app</a>.</p>`);
  $('#pmRec').onclick=()=>{let l=schedAll();if(on){l=l.filter(x=>x.id!==schedId(c,p));toast('Recording cancelled')}else{if(!confirm('Keep this tab open and the screen on until the show ends. Closing it cancels the recording.\n\nFor background recording use the CheeseTV Android / Fire TV app.\n\nSchedule this recording?'))return;l.push({id:schedId(c,p),k:ckey(c),chan:c.name,title:p.t||c.name,a:p.a,b:p.b,pl:pl()?.id});toast(`⏺ "${p.t}" will record at ${hm(p.a)}. Keep this tab open.`,6000);try{Notification?.permission==='default'&&Notification.requestPermission()}catch(e){}}
   schedSave(l.sort((x,y)=>x.a-y.a));uiBack(closeSheet);renderGuide()};
  $('#pmFav').onclick=()=>{favToast(toggleFav(c),c);uiBack(closeSheet);renderGuide()};
