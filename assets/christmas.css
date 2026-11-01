@@ -1,0 +1,18 @@
+/* CheeseTV Christmas theme — remove the christmas.css/js includes in index.html to turn off */
+#xmas-banner{background:linear-gradient(90deg,#b3121f,#0f6b34,#b3121f);color:#fff;text-align:center;font-weight:800;padding:.45rem 2.2rem;font-size:.95rem;position:relative;border-bottom:2px solid #ffd76a;letter-spacing:.3px}
+#xmas-banner b{color:#ffd76a}
+#xmas-banner button{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;font-size:18px;cursor:pointer}
+.nav .logo{position:relative}
+.nav .logo picture{position:relative;display:block}
+.nav .logo picture::after{content:"";position:absolute;top:-14px;left:-6px;width:34px;height:26px;transform:rotate(-18deg);pointer-events:none;
+background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 30'%3E%3Cpath d='M4 24 C10 6 24 0 34 8 L30 14 C26 10 20 12 16 24Z' fill='%23d4202c'/%3E%3Crect x='2' y='22' width='22' height='7' rx='3.5' fill='%23fff'/%3E%3Ccircle cx='34' cy='9' r='4.5' fill='%23fff'/%3E%3C/svg%3E") no-repeat center/contain}
+.nav{border-bottom:3px solid transparent;border-image:repeating-linear-gradient(90deg,#d4202c 0 18px,#ffd76a 18px 36px,#1f9d55 36px 54px) 3}
+.xmas-lights{display:flex;justify-content:space-around;height:14px;overflow:hidden;pointer-events:none}
+.xmas-lights i{width:8px;height:12px;border-radius:50%;background:#d4202c;box-shadow:0 0 8px currentColor;color:#d4202c;animation:xl 1.6s infinite alternate}
+.xmas-lights i:nth-child(3n+2){background:#1f9d55;color:#1f9d55;animation-delay:.5s}
+.xmas-lights i:nth-child(3n){background:#ffd76a;color:#ffd76a;animation-delay:1s}
+@keyframes xl{from{opacity:.45}to{opacity:1}}
+h2{text-shadow:0 0 18px rgba(212,32,44,.35)}
+.btn:not(.ghost){box-shadow:0 0 0 2px rgba(31,157,85,.55)}
+#xmas-snow{position:fixed;inset:0;pointer-events:none;z-index:50}
+@media (prefers-reduced-motion:reduce){#xmas-snow{display:none}.xmas-lights i{animation:none}}
