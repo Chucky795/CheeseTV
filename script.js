@@ -26,38 +26,28 @@ async function loadGuide(){
 loadGuide();setInterval(loadGuide,5*6e4);
 // What's Worth Watching (text-only recommendation cards)
 const P=[["#f0a500","#3a1c00"],["#4cc9f0","#0b1a4a"],["#f72585","#2b0538"],["#95d5b2","#0b2b1e"],["#ffd76a","#1b2a5a"],["#e09f3e","#3b0b0e"],["#a78bfa","#14103a"],["#fb8b24","#2a0f1e"]];
-const D={halloween:[
-["Halloween",1978,"Slasher","A masked killer comes home to a quiet suburb on the spookiest night of the year. The blueprint for every slasher that followed.","Shudder, AMC+"],
-["Psycho",1960,"Psychological Thriller","A woman on the run checks into a lonely motel run by a polite young man. Hitchcock's twisty, endlessly copied shocker.","Netflix, Peacock"],
-["The Exorcist",1973,"Supernatural","A mother turns to two priests when her daughter starts changing in terrifying ways. Still one of the scariest films ever made.","HBO Max"],
-["Alien",1979,"Sci-Fi Horror","A space freighter crew picks up an uninvited guest. Claustrophobic, relentless and beautifully built.","Netflix"],
-["The Shining",1980,"Psychological Horror","A writer takes his family to a snowed-in hotel for the winter, and the hotel takes him. Hypnotic, icy dread.","HBO Max"],
-["Get Out",2017,"Social Thriller","A weekend with his girlfriend's family turns into something far more sinister. Sharp, funny and deeply unnerving.","Peacock"],
-["Hereditary",2018,"Supernatural","A grieving family uncovers a dark inheritance. Devastating, and it lingers for days.","HBO Max, Hulu, Prime Video"],
-["Talk to Me",2023,"Supernatural","Teens get hooked on a party trick that lets spirits in. Slick, fast and genuinely scary.","HBO Max"],
-["Sinners",2025,"Vampire Horror","Twin brothers open a juke joint in 1930s Mississippi, and something hungry shows up. Bold, musical and bloody.","HBO Max"],
-["Weapons",2025,"Mystery Horror","A whole class of kids vanishes in the same night, and a town hunts for answers. Puzzle-box horror with a wicked streak.","HBO Max, Prime Video"]],
-movies:[
-["Clayface","Movie · Oct 23, 2026","DC Horror","A vain Hollywood actor's face, and life, start melting away in this R-rated Batman-villain spinoff. No. 1 at the box office this weekend.","In theaters (Warner Bros.)"],
-["You Can See Everything","Movie · Wide Oct 23, 2026","Documentary","Nathan Fielder and Lance Oppenheim's three-hour Elizabeth Holmes documentary, the surprise hit everyone's talking about.","In theaters (A24)"],
+const D={movies:[
+["You Can See Everything","Movie · Wide Oct 23, 2026","Documentary","Nathan Fielder and Lance Oppenheim's three-hour Elizabeth Holmes documentary edged out Clayface for No. 1 this Halloween weekend, now past $63M.","In theaters (A24)"],
+["Clayface","Movie · Oct 23, 2026","DC Horror","A vain Hollywood actor's face, and life, start melting away in this R-rated Batman-villain spinoff. A close No. 2 this weekend.","In theaters (Warner Bros.)"],
 ["Wildwood","Movie · Oct 23, 2026","Stop-Motion Animation","Laika's gorgeous new stop-motion adventure from director Travis Knight, with an A CinemaScore and rave reviews.","In theaters (Fathom)"],
 ["Wicker","Movie · Oct 23, 2026","Period Comedy","Olivia Colman orders herself a husband made of wicker, played by Alexander Skarsgård. Cheeky, romantic and a word-of-mouth hit.","In theaters (Black Bear)"],
-["Street Fighter","Movie · Oct 16, 2026","Video Game Action","The Capcom fighting-game legends hit the big screen in a loud, bone-crunching tournament brawl.","In theaters (Paramount)"],
-["The Invite","Movie · Oct 23, 2026","Comedy Drama","Olivia Wilde, Seth Rogen, Penélope Cruz and Edward Norton at a dinner party that blows two marriages wide open.","HBO Max"],
+["Verity","Movie · On demand now","Psychological Thriller","Dakota Johnson finishes a famous author's book series and finds a disturbing manuscript. Anne Hathaway and Josh Hartnett co-star in this steamy Colleen Hoover adaptation.","Digital rent or buy"],
+["Scream 7","Movie · Streaming now","Slasher Horror","Neve Campbell's Sidney Prescott is pulled out of hiding when a new Ghostface goes after her daughter.","Prime Video"],
 ["Minions & Monsters","Movie · Oct 28, 2026","Animated Comedy","The Minions are 1920s silent-film stars who accidentally unleash monsters on Los Angeles. Family movie night, sorted.","Peacock"],
-["The Mongoose","Movie · Oct 30, 2026","Action Thriller","Liam Neeson is back in action mode, with Marisa Tomei and Ving Rhames along for the ride.","In theaters"],
-["Godzilla Minus Zero","Movie · Nov 6, 2026","Kaiju Action","The follow-up to the Oscar-winning Godzilla Minus One, with Ryunosuke Kamiki and Minami Hamabe back.","In theaters (GKIDS)"],
-["The Cat in the Hat","Movie · Nov 6, 2026","Animated Family","Warner Bros.' animated take on the Dr. Seuss classic, with Bill Hader, Xochitl Gomez and Quinta Brunson in the voice cast.","In theaters (Warner Bros.)"]],
+["Godzilla Minus Zero","Movie · Nov 6, 2026","Kaiju Action","The follow-up to the Oscar-winning Godzilla Minus One, with Ryunosuke Kamiki and Minami Hamabe back. Early reviews are over 90% on Rotten Tomatoes.","In theaters (GKIDS)"],
+["The Cat in the Hat","Movie · Nov 6, 2026","Animated Family","Warner Bros.' animated take on the Dr. Seuss classic, with Bill Hader, Xochitl Gomez and Quinta Brunson in the voice cast.","In theaters (Warner Bros.)"],
+["Ebenezer: A Christmas Carol","Movie · Nov 13, 2026","Holiday Drama","Johnny Depp plays Scrooge in director Ti West's new take on the Dickens classic.","In theaters (Paramount)"],
+["How to Rob a Bank","Movie · Nov 13, 2026","Action Heist","Nicholas Hoult and Zoë Kravitz pull off viral bank heists in David Leitch's R-rated thriller, with Pete Davidson and John C. Reilly.","In theaters"]],
 series:[
-["Nocturne","Show · Premieres Oct 30, 2026","Crime Thriller","Liev Schreiber plays an ex-soldier turned detective hunting a ruthless serial killer (Stephen Graham), with Zazie Beetz as an FBI agent.","Apple TV"],
+["Nocturne","Show · Premiered Oct 30, 2026","Crime Thriller","Liev Schreiber plays an ex-soldier turned detective hunting a ruthless serial killer (Stephen Graham), with Zazie Beetz as an FBI agent.","Apple TV"],
 ["Dexter: Resurrection","Show · Season 2, Oct 30, 2026","Crime Drama","America's favorite serial killer is back for another season of dark secrets and close calls.","Paramount+"],
-["The Gilded Age","Show · Season 4, Nov 1, 2026","Period Drama","Old money versus new money in 1880s New York, with more feuds, fashion and scandal.","HBO, HBO Max"],
+["The Gilded Age","Show · Season 4, Nov 1, 2026","Period Drama","Old money versus new money in 1880s New York. Agnes plots her comeback with a dinner for President Grover Cleveland (Jim Gaffigan).","HBO, HBO Max"],
 ["The Greatest","Show · Premieres Nov 4, 2026","Biopic Drama","Jaalen Best stars as Cassius Clay and Muhammad Ali in the first authorized scripted series about the champ.","Prime Video"],
-["Black Doves","Show · Season 2, Nov 5, 2026","Spy Thriller","The stylish London spy thriller returns with all six new episodes at once.","Netflix"],
-["Nobody Wants This","Show · Season 3, Oct 22, 2026","Romantic Comedy","The rom-com about an outspoken podcaster and a rabbi is back with 10 new episodes to binge.","Netflix"],
-["The Terminal List","Show · Season 2, Oct 21, 2026","Action Thriller","Navy SEAL James Reece returns for another hard-hitting season, all eight episodes at once.","Prime Video"],
-["Minimum Wage","Show · Premieres Oct 26, 2026","Comedy","Teens try to keep a pizza shop running for a manic boss (Randall Park). Based on the hit social media shorts.","Netflix"],
-["Phony","Show · Premieres Oct 20, 2026","Mystery Thriller","After a car crash, a teen (Sam Nivola) is convinced his mom (Connie Britton) is an impostor.","Hulu"],
-["VisionQuest","Show · New episodes weekly","Superhero Drama","Hunted and haunted by Ultron, Vision has to figure out what he really is. The series finale lands Nov 10.","Disney+"]]};
+["Stick","Show · Season 2, Nov 4, 2026","Sports Comedy","Owen Wilson's washed-up golfer takes another swing at his own career and sets his sights on the U.S. Open.","Apple TV"],
+["Black Doves","Show · Season 2, Nov 5, 2026","Spy Thriller","Keira Knightley and Ben Whishaw return to the stylish London spy thriller, with all new episodes at once.","Netflix"],
+["The Institute","Show · Season 2, Nov 8, 2026","Sci-Fi Thriller","The escaped psychic kids fight to keep the Institute dead as a tech billionaire (Alfie Allen) helps rebuild it. The story now goes beyond Stephen King's book.","MGM+"],
+["VisionQuest","Show · New episodes weekly","Superhero Drama","Hunted and haunted by Ultron, Vision has to figure out what he really is. The series finale lands Nov 10.","Disney+"],
+["The Lord of the Rings: The Rings of Power","Show · Season 3, Nov 11, 2026","Fantasy Epic","Sauron is back with a bigger army and sets out to forge the One Ring, while Galadriel and Elrond try to unite the free peoples.","Prime Video"],
+["The Good Daughter","Show · Premieres Nov 12, 2026","Mystery Thriller","Rose Byrne and Meghann Fahy play estranged lawyer sisters pulled back together by a brutal case, from Karin Slaughter's bestseller.","Peacock"]]};
 document.querySelectorAll('[data-row]').forEach(r=>{const s=r.dataset.row;r.innerHTML=D[s].map(([t,y,g,d,w],i)=>{const[a,b]=s==="halloween"?(i%2?["#a855f7","#1e0a33"]:["#ff7a18","#2a0f00"]):P[i%P.length];return`<article class="tile rec" style="--a:${a};--b:${b}"><div class="rec-top"><span class="rec-no">${String(i+1).padStart(2,'0')}</span><span class="rec-g">${g}</span></div><h4>${t}</h4><p class="rec-y">${y}</p><p class="rec-d">${d}</p><p class="rec-w"><span>Where to watch</span>${w}</p></article>`}).join('')});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
