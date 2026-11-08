@@ -27,27 +27,27 @@ loadGuide();setInterval(loadGuide,5*6e4);
 // What's Worth Watching (text-only recommendation cards)
 const P=[["#f0a500","#3a1c00"],["#4cc9f0","#0b1a4a"],["#f72585","#2b0538"],["#95d5b2","#0b2b1e"],["#ffd76a","#1b2a5a"],["#e09f3e","#3b0b0e"],["#a78bfa","#14103a"],["#fb8b24","#2a0f1e"]];
 const D={movies:[
-["You Can See Everything","Movie · Wide Oct 23, 2026","Documentary","Nathan Fielder and Lance Oppenheim's three-hour Elizabeth Holmes documentary edged out Clayface for No. 1 this Halloween weekend, now past $63M.","In theaters (A24)"],
-["Clayface","Movie · Oct 23, 2026","DC Horror","A vain Hollywood actor's face, and life, start melting away in this R-rated Batman-villain spinoff. A close No. 2 this weekend.","In theaters (Warner Bros.)"],
-["Wildwood","Movie · Oct 23, 2026","Stop-Motion Animation","Laika's gorgeous new stop-motion adventure from director Travis Knight, with an A CinemaScore and rave reviews.","In theaters (Fathom)"],
-["Wicker","Movie · Oct 23, 2026","Period Comedy","Olivia Colman orders herself a husband made of wicker, played by Alexander Skarsgård. Cheeky, romantic and a word-of-mouth hit.","In theaters (Black Bear)"],
-["Verity","Movie · On demand now","Psychological Thriller","Dakota Johnson finishes a famous author's book series and finds a disturbing manuscript. Anne Hathaway and Josh Hartnett co-star in this steamy Colleen Hoover adaptation.","Digital rent or buy"],
-["Scream 7","Movie · Streaming now","Slasher Horror","Neve Campbell's Sidney Prescott is pulled out of hiding when a new Ghostface goes after her daughter.","Prime Video"],
-["Minions & Monsters","Movie · Oct 28, 2026","Animated Comedy","The Minions are 1920s silent-film stars who accidentally unleash monsters on Los Angeles. Family movie night, sorted.","Peacock"],
-["Godzilla Minus Zero","Movie · Nov 6, 2026","Kaiju Action","The follow-up to the Oscar-winning Godzilla Minus One, with Ryunosuke Kamiki and Minami Hamabe back. Early reviews are over 90% on Rotten Tomatoes.","In theaters (GKIDS)"],
-["The Cat in the Hat","Movie · Nov 6, 2026","Animated Family","Warner Bros.' animated take on the Dr. Seuss classic, with Bill Hader, Xochitl Gomez and Quinta Brunson in the voice cast.","In theaters (Warner Bros.)"],
+["Godzilla Minus Zero","Movie · Nov 6, 2026","Kaiju Action","The follow-up to Godzilla Minus One opened at No. 1 with $31.6 million. Reviews are at 90% on Rotten Tomatoes.","In theaters (GKIDS)"],
+["The Cat in the Hat","Movie · Nov 6, 2026","Animated Family","Warner Bros.' animated take on the Dr. Seuss classic, with Bill Hader voicing the Cat, opened in second place.","In theaters (Warner Bros.)"],
+["Drummer Boy","Movie · Nov 6, 2026","Historical Musical","Angel Studios' Revolutionary War musical about two brothers who fight on opposite sides opened in third place this weekend.","In theaters (Angel Studios)"],
+["Wild Horse Nine","Movie · Nov 6, 2026","Dark Comedy","Martin McDonagh's new film, with Sam Rockwell and John Malkovich as CIA agents sent to Easter Island before Chile's 1973 coup.","In theaters (Searchlight)"],
+["I Play Rocky","Movie · Limited Nov 6, 2026","Biographical Drama","Peter Farrelly's film starring Anthony Ippolito as a young Sylvester Stallone fighting to star in his own script. It expands wide Nov 20.","In theaters (Amazon MGM)"],
+["Club Kid","Movie · Limited Nov 6, 2026","Comedy Drama","Jordan Firstman's A24 film follows a New York club promoter who discovers he has a 10-year-old son.","In theaters (A24)"],
 ["Ebenezer: A Christmas Carol","Movie · Nov 13, 2026","Holiday Drama","Johnny Depp plays Scrooge in director Ti West's new take on the Dickens classic.","In theaters (Paramount)"],
-["How to Rob a Bank","Movie · Nov 13, 2026","Action Heist","Nicholas Hoult and Zoë Kravitz pull off viral bank heists in David Leitch's R-rated thriller, with Pete Davidson and John C. Reilly.","In theaters"]],
+["How to Rob a Bank","Movie · Nov 13, 2026","Action Heist","Nicholas Hoult and Zoë Kravitz pull off viral bank heists in David Leitch's R-rated thriller, with Pete Davidson and John C. Reilly.","In theaters"],
+["Victorian Psycho","Movie · Nov 13, 2026","Period Horror","An eccentric governess at a remote gothic estate hides a violent streak as staff members start disappearing.","In theaters (Bleecker Street)"],
+["The Hunger Games: Sunrise on the Reaping","Movie · Nov 20, 2026","Dystopian Action","Lionsgate's Hunger Games prequel opens wide next week.","In theaters (Lionsgate)"]],
 series:[
-["Nocturne","Show · Premiered Oct 30, 2026","Crime Thriller","Liev Schreiber plays an ex-soldier turned detective hunting a ruthless serial killer (Stephen Graham), with Zazie Beetz as an FBI agent.","Apple TV"],
-["Dexter: Resurrection","Show · Season 2, Oct 30, 2026","Crime Drama","America's favorite serial killer is back for another season of dark secrets and close calls.","Paramount+"],
-["The Gilded Age","Show · Season 4, Nov 1, 2026","Period Drama","Old money versus new money in 1880s New York. Agnes plots her comeback with a dinner for President Grover Cleveland (Jim Gaffigan).","HBO, HBO Max"],
-["The Greatest","Show · Premieres Nov 4, 2026","Biopic Drama","Jaalen Best stars as Cassius Clay and Muhammad Ali in the first authorized scripted series about the champ.","Prime Video"],
-["Stick","Show · Season 2, Nov 4, 2026","Sports Comedy","Owen Wilson's washed-up golfer takes another swing at his own career and sets his sights on the U.S. Open.","Apple TV"],
-["Black Doves","Show · Season 2, Nov 5, 2026","Spy Thriller","Keira Knightley and Ben Whishaw return to the stylish London spy thriller, with all new episodes at once.","Netflix"],
 ["The Institute","Show · Season 2, Nov 8, 2026","Sci-Fi Thriller","The escaped psychic kids fight to keep the Institute dead as a tech billionaire (Alfie Allen) helps rebuild it. The story now goes beyond Stephen King's book.","MGM+"],
-["VisionQuest","Show · New episodes weekly","Superhero Drama","Hunted and haunted by Ultron, Vision has to figure out what he really is. The series finale lands Nov 10.","Disney+"],
+["City of God: The Fight Rages On","Show · Season 2, Nov 8, 2026","Crime Drama","Season 2 of the Brazilian crime drama premieres today.","HBO Max"],
+["Black Doves","Show · Season 2, Nov 5, 2026","Spy Thriller","Keira Knightley and Ben Whishaw return to the stylish London spy thriller, with all new episodes at once.","Netflix"],
+["The Gilded Age","Show · Season 4, Nov 1, 2026","Period Drama","Old money versus new money in 1880s New York. Agnes plots her comeback with a dinner for President Grover Cleveland (Jim Gaffigan).","HBO, HBO Max"],
 ["The Lord of the Rings: The Rings of Power","Show · Season 3, Nov 11, 2026","Fantasy Epic","Sauron is back with a bigger army and sets out to forge the One Ring, while Galadriel and Elrond try to unite the free peoples.","Prime Video"],
-["The Good Daughter","Show · Premieres Nov 12, 2026","Mystery Thriller","Rose Byrne and Meghann Fahy play estranged lawyer sisters pulled back together by a brutal case, from Karin Slaughter's bestseller.","Peacock"]]};
+["The Body","Show · Premieres Nov 11, 2026","Supernatural Horror","After a dance-team initiation goes wrong, a group of Catholic school girls begin having prophetic visions that set off mass hysteria in their town.","Netflix"],
+["The Good Daughter","Show · Premieres Nov 12, 2026","Mystery Thriller","Rose Byrne and Meghann Fahy play estranged lawyer sisters pulled back together by a brutal case, from Karin Slaughter's bestseller.","Peacock"],
+["The Empress","Show · Season 3, Nov 12, 2026","Period Drama","The final season of Netflix's royal drama arrives this week.","Netflix"],
+["The Chosen","Show · Season 6, Nov 15, 2026","Historical Drama","Season 6 of the faith-based series premieres on Prime Video.","Prime Video"],
+["Percy Jackson and the Olympians","Show · Season 3, Nov 20, 2026","Fantasy Adventure","Season 3 of Disney+'s Percy Jackson series arrives next week.","Disney+"],
+["Yellowjackets","Show · Season 4, Nov 20, 2026","Survival Thriller","The final season of the survival thriller premieres next week on Showtime.","Showtime"]]};
 document.querySelectorAll('[data-row]').forEach(r=>{const s=r.dataset.row;r.innerHTML=D[s].map(([t,y,g,d,w],i)=>{const[a,b]=s==="halloween"?(i%2?["#a855f7","#1e0a33"]:["#ff7a18","#2a0f00"]):P[i%P.length];return`<article class="tile rec" style="--a:${a};--b:${b}"><div class="rec-top"><span class="rec-no">${String(i+1).padStart(2,'0')}</span><span class="rec-g">${g}</span></div><h4>${t}</h4><p class="rec-y">${y}</p><p class="rec-d">${d}</p><p class="rec-w"><span>Where to watch</span>${w}</p></article>`}).join('')});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
