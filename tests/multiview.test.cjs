@@ -1,0 +1,21 @@
+// v34 Multi-view rules (node tests/multiview.test.cjs). No network.
+const assert=require('assert');const M=require('../app/multiview.js');
+const ch=i=>({id:'x'+i,name:'Game '+i,url:`http://mock.test/live/u/p/${i}.ts`,alt:`http://mock.test/live/u/p/${i}.m3u8`});
+const fill=(st,n)=>{for(let i=0;i<n;i++)M.assign(st,i,ch(100+i));return st};
+let t=0;const ok=(name,fn)=>{fn();t++;console.log('ok',name)};
+ok('parse max_connections',()=>{assert.equal(M.parseMax({user_info:{max_connections:'3'}}),3);assert.equal(M.parseMax({user_info:{max_connections:2}}),2);
+ assert.equal(M.parseMax({user_info:{max_connections:'0'}}),null);assert.equal(M.parseMax({user_info:{}}),null);assert.equal(M.parseMax(null),null)});
+ok('plan cap + message',()=>{const s=M.init(4);assert.equal(s.planChecked,false);M.setPlan(s,2);assert.equal(s.banner,'Your plan allows 2 screens at once');fill(s,4);
+ assert.equal(M.liveCount(s),2);assert.deepEqual(M.wanted(s),[0,1]);assert.equal(M.setPlan(M.init(4),1).banner,'Your plan allows 1 screen at once');
+ assert.equal(M.setLayout(M.setPlan(M.init(4),2),2).banner,null)});
+ok('late plan keeps selected',()=>{const s=fill(M.init(4),4);M.select(s,3);M.setPlan(s,2);assert.deepEqual(M.wanted(s),[0,3])});
+ok('swap moves audio',()=>{const s=fill(M.init(4),3);M.select(s,0);M.swap(s,0,2);assert.equal(s.tiles[0].ch.id,'x102');assert.equal(s.tiles[2].ch.id,'x100');assert.equal(s.sel,2);assert.equal(s.tiles[0].i,0)});
+ok('fullscreen toggle',()=>{const s=fill(M.init(4),2);M.toggleFull(s,1);assert.equal(s.full,1);assert.equal(s.sel,1);M.toggleFull(s,1);assert.equal(s.full,null);M.toggleFull(s,3);assert.equal(s.full,null)});
+ok('decoder failure degrades',()=>{const s=fill(M.init(4),4);[0,1,2].forEach(i=>M.status(s,i,'playing'));M.decoderFailed(s,3);assert.equal(s.device,3);assert.equal(M.liveCount(s),3);
+ assert.ok(/3 streams/.test(s.banner));M.assign(s,3,ch(9));assert.equal(s.tiles[3].ch,null);const o=fill(M.init(4),1);M.decoderFailed(o,0);assert.equal(o.device,1)});
+ok('layout switch closes hidden tiles',()=>{const s=fill(M.init(4),4);M.select(s,3);M.setLayout(s,2);assert.deepEqual(M.wanted(s),[0,1]);assert.equal(s.tiles[3].ch,null);assert.equal(s.sel,1)});
+ok('refused blocks',()=>{const s=fill(M.init(4),2);M.refused(s,1,403);assert.equal(s.tiles[1].status,'blocked');assert.deepEqual(M.wanted(s),[0]);M.assign(s,1,ch(5));assert.equal(s.tiles[1].status,'loading')});
+ok('arrow keys',()=>{const s=M.init(4);assert.equal(M.move(s,1,0),1);assert.equal(M.move(s,0,1),2);assert.equal(M.move(s,-1,0),0);const two=M.setLayout(M.init(4),2);M.select(two,1);assert.equal(M.move(two,0,1),1)});
+ok('hls first',()=>{assert.deepEqual(M.urls(ch(7)),['http://mock.test/live/u/p/7.m3u8','http://mock.test/live/u/p/7.ts'])});
+ok('device limit',()=>{assert.equal(M.deviceLimit(8,8,false),4);assert.equal(M.deviceLimit(2,4,false),2);assert.equal(M.deviceLimit(4,2,false),3);assert.equal(M.deviceLimit(8,8,true),2)});
+console.log(`multiview: ${t} passed`);
