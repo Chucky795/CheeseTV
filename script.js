@@ -27,27 +27,24 @@ loadGuide();setInterval(loadGuide,5*6e4);
 // What's Worth Watching (text-only recommendation cards)
 const P=[["#f0a500","#3a1c00"],["#4cc9f0","#0b1a4a"],["#f72585","#2b0538"],["#95d5b2","#0b2b1e"],["#ffd76a","#1b2a5a"],["#e09f3e","#3b0b0e"],["#a78bfa","#14103a"],["#fb8b24","#2a0f1e"]];
 const D={movies:[
-["Godzilla Minus Zero","Movie · Nov 6, 2026","Kaiju Action","The follow-up to Godzilla Minus One opened at No. 1 with $31.6 million. Reviews are at 90% on Rotten Tomatoes.","In theaters (GKIDS)"],
-["The Cat in the Hat","Movie · Nov 6, 2026","Animated Family","Warner Bros.' animated take on the Dr. Seuss classic, with Bill Hader voicing the Cat, opened in second place.","In theaters (Warner Bros.)"],
-["Drummer Boy","Movie · Nov 6, 2026","Historical Musical","Angel Studios' Revolutionary War musical about two brothers who fight on opposite sides opened in third place this weekend.","In theaters (Angel Studios)"],
-["Wild Horse Nine","Movie · Nov 6, 2026","Dark Comedy","Martin McDonagh's new film, with Sam Rockwell and John Malkovich as CIA agents sent to Easter Island before Chile's 1973 coup.","In theaters (Searchlight)"],
-["I Play Rocky","Movie · Limited Nov 6, 2026","Biographical Drama","Peter Farrelly's film starring Anthony Ippolito as a young Sylvester Stallone fighting to star in his own script. It expands wide Nov 20.","In theaters (Amazon MGM)"],
-["Club Kid","Movie · Limited Nov 6, 2026","Comedy Drama","Jordan Firstman's A24 film follows a New York club promoter who discovers he has a 10-year-old son.","In theaters (A24)"],
-["Ebenezer: A Christmas Carol","Movie · Nov 13, 2026","Holiday Drama","Johnny Depp plays Scrooge in director Ti West's new take on the Dickens classic.","In theaters (Paramount)"],
-["How to Rob a Bank","Movie · Nov 13, 2026","Action Heist","Nicholas Hoult and Zoë Kravitz pull off viral bank heists in David Leitch's R-rated thriller, with Pete Davidson and John C. Reilly.","In theaters"],
-["Victorian Psycho","Movie · Nov 13, 2026","Period Horror","An eccentric governess at a remote gothic estate hides a violent streak as staff members start disappearing.","In theaters (Bleecker Street)"],
-["The Hunger Games: Sunrise on the Reaping","Movie · Nov 20, 2026","Dystopian Action","Lionsgate's Hunger Games prequel opens wide next week.","In theaters (Lionsgate)"]],
+["Ebenezer: A Christmas Carol","Movie · Nov 13, 2026","Holiday Drama","Johnny Depp's Scrooge in Ti West's new take on the Dickens classic opened at No. 1 with $19 million.","In theaters (Paramount)"],
+["The Cat in the Hat","Movie · Nov 6, 2026","Animated Family","Warner Bros.' animated Dr. Seuss adaptation held second place with $11.4 million in its second weekend.","In theaters (Warner Bros.)"],
+["Godzilla Minus Zero","Movie · Nov 6, 2026","Kaiju Action","The follow-up to Godzilla Minus One is still in the top three after a $48.9 million first ten days.","In theaters (GKIDS)"],
+["Heartland","Movie · Nov 13, 2026","Drama","Jessica Chastain plays a prickly retired country star searching for her missing niece in Nashville.","Netflix"],
+["The End of Oak Street","Movie · Nov 13, 2026","Sci-Fi Adventure","David Robert Mitchell's dinosaur thriller with Ewan McGregor and Anne Hathaway, about a family trapped in a prehistoric world.","HBO Max"],
+["Madden","Movie · Nov 18, 2026","Sports Biopic","Nicolas Cage is John Madden and Christian Bale is Raiders owner Al Davis, with Kathryn Hahn and Sienna Miller.","Prime Video"],
+["The Hunger Games: Sunrise on the Reaping","Movie · Nov 20, 2026","Dystopian Action","Lionsgate's Hunger Games prequel following young Haymitch Abernathy in the 50th Hunger Games opens wide this week.","In theaters (Lionsgate)"],
+["Steps","Movie · Nov 20, 2026","Animated Comedy","An animated twist on Cinderella, with Ali Wong, Stephanie Hsu, Amanda Seyfried and Nikki Glaser voicing.","Netflix"],
+["Hexed","Movie · Nov 25, 2026","Animated Family","Disney's animated Hexed opens for Thanksgiving week.","In theaters (Disney)"]],
 series:[
-["The Institute","Show · Season 2, Nov 8, 2026","Sci-Fi Thriller","The escaped psychic kids fight to keep the Institute dead as a tech billionaire (Alfie Allen) helps rebuild it. The story now goes beyond Stephen King's book.","MGM+"],
-["City of God: The Fight Rages On","Show · Season 2, Nov 8, 2026","Crime Drama","Season 2 of the Brazilian crime drama premieres today.","HBO Max"],
-["Black Doves","Show · Season 2, Nov 5, 2026","Spy Thriller","Keira Knightley and Ben Whishaw return to the stylish London spy thriller, with all new episodes at once.","Netflix"],
-["The Gilded Age","Show · Season 4, Nov 1, 2026","Period Drama","Old money versus new money in 1880s New York. Agnes plots her comeback with a dinner for President Grover Cleveland (Jim Gaffigan).","HBO, HBO Max"],
-["The Lord of the Rings: The Rings of Power","Show · Season 3, Nov 11, 2026","Fantasy Epic","Sauron is back with a bigger army and sets out to forge the One Ring, while Galadriel and Elrond try to unite the free peoples.","Prime Video"],
-["The Body","Show · Premieres Nov 11, 2026","Supernatural Horror","After a dance-team initiation goes wrong, a group of Catholic school girls begin having prophetic visions that set off mass hysteria in their town.","Netflix"],
-["The Good Daughter","Show · Premieres Nov 12, 2026","Mystery Thriller","Rose Byrne and Meghann Fahy play estranged lawyer sisters pulled back together by a brutal case, from Karin Slaughter's bestseller.","Peacock"],
-["The Empress","Show · Season 3, Nov 12, 2026","Period Drama","The final season of Netflix's royal drama arrives this week.","Netflix"],
-["The Chosen","Show · Season 6, Nov 15, 2026","Historical Drama","Season 6 of the faith-based series premieres on Prime Video.","Prime Video"],
-["Percy Jackson and the Olympians","Show · Season 3, Nov 20, 2026","Fantasy Adventure","Season 3 of Disney+'s Percy Jackson series arrives next week.","Disney+"],
-["Yellowjackets","Show · Season 4, Nov 20, 2026","Survival Thriller","The final season of the survival thriller premieres next week on Showtime.","Showtime"]]};
+["The Lord of the Rings: The Rings of Power","Show · Season 3, Nov 11, 2026","Fantasy Epic","Sauron builds a bigger army while Galadriel and Elrond try to unite the free peoples. Two more episodes Nov 18; finale Nov 25.","Prime Video"],
+["The Good Daughter","Show · Premiered Nov 12, 2026","Mystery Thriller","Rose Byrne and Meghann Fahy play estranged sisters pulled together by a brutal case, from Karin Slaughter's bestseller.","Peacock"],
+["12 12 12","Show · Premiered Nov 13, 2026","Heist Thriller","Anthony Mackie and Jamie Dornan face off around a Zürich heist, told across three timelines in each episode.","Apple TV"],
+["The Chosen","Show · Season 6, Nov 15, 2026","Historical Drama","Season 6 of the faith-based series starts with a three-episode premiere.","Prime Video"],
+["Cunk on Cinema","Show · Nov 15, 2026","Comedy","Diane Morgan's Philomena Cunk tackles the history of cinema in a six-episode binge.","Netflix"],
+["Win the Mall","Show · Nov 18, 2026","Reality Competition","Players compete to outshop and outlast each other in a living mall, hosted by Haley Baylee. Eight episodes at once.","Netflix"],
+["The Altruists","Show · Nov 19, 2026","Drama","Anthony Boyle and Julia Garner play Sam Bankman-Fried and Caroline Ellison. Eight episodes at once.","Netflix"],
+["Percy Jackson and the Olympians","Show · Season 3, Nov 20, 2026","Fantasy Adventure","Season 3 begins with a two-episode premiere.","Disney+"],
+["Yellowjackets","Show · Final Season, Nov 20, 2026","Survival Thriller","The survival thriller's final season premieres.","Paramount+"]]};
 document.querySelectorAll('[data-row]').forEach(r=>{const s=r.dataset.row;r.innerHTML=D[s].map(([t,y,g,d,w],i)=>{const[a,b]=s==="halloween"?(i%2?["#a855f7","#1e0a33"]:["#ff7a18","#2a0f00"]):P[i%P.length];return`<article class="tile rec" style="--a:${a};--b:${b}"><div class="rec-top"><span class="rec-no">${String(i+1).padStart(2,'0')}</span><span class="rec-g">${g}</span></div><h4>${t}</h4><p class="rec-y">${y}</p><p class="rec-d">${d}</p><p class="rec-w"><span>Where to watch</span>${w}</p></article>`}).join('')});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
