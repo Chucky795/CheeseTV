@@ -1,4 +1,4 @@
-const C='cheesetv-v16',A=['/assets/logo-112.png','/assets/logo-112.webp','/icons/favicon-32.png','/','/index.html','/styles.css?v=20261116','/script.js?v=20261115','/assets/christmas.css?v=20261115','/assets/christmas.js?v=20261115','/offline.html','/manifest.webmanifest','/icons/icon-192.png','/icons/icon-512.png'];
+const C='cheesetv-v17',A=['/assets/logo-112.png','/assets/logo-112.webp','/icons/favicon-32.png','/','/index.html','/styles.css?v=20261116','/script.js?v=20261115','/assets/christmas.css?v=20261115','/assets/christmas.js?v=20261115','/offline.html','/manifest.webmanifest','/icons/icon-192.png','/icons/icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim()});
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin||new URL(r.url).pathname.startsWith('/app/'))return;

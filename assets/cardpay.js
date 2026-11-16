@@ -56,7 +56,7 @@ async function start(o){
  const kind=o.kind==='renewal'?'renewal':'new',n=+o.connections;
  const save=ref=>{try{localStorage.setItem('ctv_checkout',JSON.stringify({kind,n,email:o.email,username:o.username||null,ref,t:Date.now()}))}catch(e){}};
  let ref=null,j=null;
- try{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),15000);
+ try{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),40000);
   const r=await fetch(SB+'/functions/v1/paymegate-checkout',{method:'POST',signal:ac.signal,headers:{apikey:KEY,'Content-Type':'application/json'},
    body:JSON.stringify({kind,connections:n,email:o.email,name:o.name||null,phone:o.phone||null,device:o.device||null,username:o.username||null})});
   clearTimeout(tm);j=await r.json().catch(()=>null);
