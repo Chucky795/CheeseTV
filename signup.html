@@ -35,7 +35,7 @@ input:focus,select:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6
 <label class="opt on"><span><input type="radio" name="pm" value="zelle" checked>Zelle</span><b>From your bank app</b></label>
 <label class="opt"><span><input type="radio" name="pm" value="card">💳 Card · Apple Pay · Google Pay</span><b>Secure checkout</b></label>
 </div>
-<p class="nc" id="cardnote" hidden>You'll go to our secure checkout page (PayMeGate) to pay by card, Apple Pay, Google Pay, PayPal, Cash App or Venmo. It's a one-time payment for one month, not a subscription, so you renew each month. We email your login within 1–3 hours. No refunds, so try the <a href="/trial.html">free 12-hour trial</a> first.</p>
+<p class="nc" id="cardnote" hidden>You'll go to our secure checkout page (PayMeGate) to pay by card, Apple Pay, Google Pay, PayPal, Cash App or Venmo. Card (choose <b>Stripe (Credit Card)</b>, recommended) is processed by our payment partner and may show as a small crypto purchase. That's normal, no crypto knowledge or wallet needed, and the payment goes to CheeseTV. It's a one-time payment for one month, not a subscription, so you renew each month. We email your login within 1–3 hours. No refunds, so try the <a href="/trial.html">free 12-hour trial</a> first.</p>
 <div class="total"><span>Total this month</span><b id="t">$14.99</b></div>
 <button class="btn lg block" style="margin-top:1.4rem" id="go">Continue to payment</button>
 <p class="msg" id="m" role="status"></p>
@@ -47,7 +47,7 @@ input:focus,select:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6
 <p class="zl" style="margin-top:1rem">That's it! Once we see your payment, we'll email your username, password and setup steps to <b id="ze"></b>. Usually the same day.</p>
 <p class="nc">We never ask for card details by email, text or chat. Card payments only happen on our secure checkout page.</p>
 </div></main>
-<script src="assets/cardpay.js?v=1"></script>
+<script src="assets/cardpay.js?v=2"></script>
 <script>
 const SB="https://vrmtxrtzweblakuvkwoe.supabase.co",KEY="sb_publishable_zvptRN1xVVYyt6jP1B-5vA_netcK9Vm";
 const $=id=>document.getElementById(id);let amt="14.99";
@@ -68,7 +68,7 @@ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){m.className='msg err';m.textContent='
 if(!d){m.className='msg err';m.textContent='Please choose your device.';return}
 $('go').disabled=true;m.textContent='Sending…';
 if(isCard()){m.textContent='Opening secure checkout…';
- try{await CardPay.start({kind:'new',connections:+document.querySelector('input[name=k]:checked').value,email:em,name:n,phone:p,device:d})}
+ try{const ok=await CardPay.start({kind:'new',connections:+document.querySelector('input[name=k]:checked').value,email:em,name:n,phone:p,device:d});if(ok===false){m.textContent='';$('go').disabled=false}}
  catch(x){m.className='msg err';m.textContent='Could not open checkout. Please try again.';$('go').disabled=false}
  return}
 try{const r=await fetch(SB+'/rest/v1/rpc/submit_signup',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
