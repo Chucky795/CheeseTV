@@ -14,3 +14,8 @@ The site POSTs the form to `functions/v1/paymegate-checkout` (verify_jwt off). I
 and a 2 h expiry, and returns the branded `/pay/<order>` URL (logo badge + Return to Cheese TV). Key: Vault
 `paymegate_api_key` via `pmg_secrets().api`. On failure the site falls back to the public product link. The webhook
 matches exactly by checkout_id / externalId before the email match.
+
+## Disabled 2026-11-15
+CheeseTV went back to Zelle only. The deployed paymegate-checkout and paymegate-webhook functions are 410 stubs, the
+PayMeGate secrets were deleted from Vault, and the site no longer loads cardpay.js. Tables and migrations are kept.
+Full working state: branch archive/paymegate-card-checkout.

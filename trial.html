@@ -46,5 +46,5 @@ const j=await r.json();if(!r.ok)throw new Error(j.message||'Something went wrong
 if(j.duplicate){m.className='msg err';m.innerHTML='A free trial was already requested with this email or phone. Questions? Use the chat or the <a href="/#contact">contact form</a> and we\'ll help.';$('go').disabled=false;return}
 $('f').hidden=true;$('done').hidden=false;$('done').scrollIntoView({behavior:'smooth'});}
 catch(x){m.className='msg err';m.textContent=x.message+'. Please try again.';$('go').disabled=false}};
-</script><script src="assets/chatbot.js?v=20261116b" defer></script>
+</script><script src="assets/chatbot.js?v=20261028t" defer></script>
 <script src="/assets/visit.js" defer></script></body></html>
