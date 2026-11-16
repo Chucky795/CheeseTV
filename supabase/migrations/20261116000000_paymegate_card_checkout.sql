@@ -56,3 +56,13 @@ create trigger signup_notify after insert on public.signup_requests for each row
 drop trigger if exists renewal_notify on public.renewal_requests;
 create trigger renewal_notify after insert on public.renewal_requests for each row
  when (new.status = 'pending') execute function public.notify_renewal();
+
+-- Webhook signing secret lives in Vault as 'paymegate_webhook_secret' (no CLI/management token for function env secrets).
+create or replace function public.pmg_secrets() returns json language sql security definer set search_path=public as $$
+ select json_build_object('webhook',(select decrypted_secret from vault.decrypted_secrets where name='paymegate_webhook_secret'));
+$$;
+revoke all on function public.pmg_secrets() from public, anon, authenticated;
+grant execute on function public.pmg_secrets() to service_role;
+
+-- Telegram delivery result per event (true when Telegram accepted the alert).
+alter table public.paymegate_events add column if not exists alert_ok boolean;

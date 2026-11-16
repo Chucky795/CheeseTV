@@ -112,9 +112,10 @@ export function makeHandler(d: Deps) {
     await d.db(`paymegate_events?event_id=eq.${eventId}`, { method: "PATCH", body: JSON.stringify({ kind, checkout_id: co?.id ?? null,
       ...(kind === "new" ? { signup_id: ref } : kind === "renewal" ? { renewal_id: ref } : {}) }) });
 
-    await d.telegram("sendMessage", { chat_id: OWNER, text: alertText({ kind, n, amount: String(ev.amount), currency: ev.currency || "USD", email,
+    const tr: any = await d.telegram("sendMessage", { chat_id: OWNER, text: alertText({ kind, n, amount: String(ev.amount), currency: ev.currency || "USD", email,
       username: co?.username, name: co?.customer_name, phone: co?.phone, device: co?.device, order: ev.orderUUID, ref, test, siteEmail }),
       ...(markup ? { reply_markup: markup } : {}) });
+    await d.db(`paymegate_events?event_id=eq.${eventId}`, { method: "PATCH", body: JSON.stringify({ alert_ok: !!tr?.ok }) });
     return new Response("ok", { status: 200 });
   };
 }

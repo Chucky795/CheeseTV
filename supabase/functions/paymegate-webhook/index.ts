@@ -1,6 +1,6 @@
 // Supabase Edge Function: paymegate-webhook (prepared, NOT deployed). Deploy with --no-verify-jwt
 // (PayMeGate can't send a Supabase JWT; the HMAC signature is the authentication).
-// Secrets: PAYMEGATE_WEBHOOK_SECRET (returned once by PayMeGate when the webhook is first configured).
+// Signing secret (returned once by PayMeGate when the webhook is first configured): env or Vault, see below.
 // Telegram token: GROK795_BOT_TOKEN if set, otherwise the existing Vault secret via tg_secrets().
 import { makeHandler } from "./handler.ts";
 
@@ -20,4 +20,13 @@ async function telegram(method: string, body: unknown) {
   return await r.json().catch(() => null);
 }
 
-Deno.serve(makeHandler({ secret: Deno.env.get("PAYMEGATE_WEBHOOK_SECRET") || "", db, telegram }));
+// Signing secret: PAYMEGATE_WEBHOOK_SECRET env if set, otherwise Vault 'paymegate_webhook_secret' via pmg_secrets().
+let secret = Deno.env.get("PAYMEGATE_WEBHOOK_SECRET") || "";
+let handler: ((r: Request) => Promise<Response>) | null = null;
+Deno.serve(async (req) => {
+  if (req.method !== "POST") return new Response("ok"); // reachability probes
+  if (!secret) secret = (await (await fetch(`${SB}/rest/v1/rpc/pmg_secrets`, { method: "POST", headers: H, body: "{}" })).json().catch(() => null))?.webhook || "";
+  if (!secret) return new Response("not configured yet", { status: 200 }); // only before first setup (PayMeGate probes the URL)
+  if (!handler) handler = makeHandler({ secret, db, telegram });
+  return handler(req);
+});

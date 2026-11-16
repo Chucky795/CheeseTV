@@ -1,20 +1,9 @@
-# PayMeGate card checkout: publish checklist (nothing here is live yet)
+# PayMeGate card checkout: live setup (Nov 15, 2026)
 
-Order matters: the site's card buttons call `start_card_checkout`, so apply the DB change first.
-
-1. **DB:** apply `supabase/migrations/20261116000000_paymegate_card_checkout.sql`.
-   It adds `card_checkouts` and `paymegate_events` plus the `start_card_checkout` RPC, and limits the Zelle alert triggers to `status='pending'`.
-2. **Function:** deploy with `supabase functions deploy paymegate-webhook --no-verify-jwt`.
-3. **Webhook:** `PUT https://api.paymegate.com/v1/webhook` with `{"url":"https://vrmtxrtzweblakuvkwoe.supabase.co/functions/v1/paymegate-webhook"}`.
-   On first setup, the response includes `signingSecret` **once**. Store it only as a Supabase secret:
-   `supabase secrets set PAYMEGATE_WEBHOOK_SECRET=...`. Never print or commit it.
-   Then confirm in the dashboard, under Settings → Webhooks, that `order.paid` is subscribed.
-4. **Return to site:** in the PayMeGate dashboard, set Custom Checkout → Back URL to `https://watchcheesetv.com/thank-you.html`.
-   This is account-wide; the API has no per-product return URL. The renewal wording on the thank-you page comes from `localStorage` (or `?renew=1`).
-5. **Site:** push this branch to CheeseTV main and the matching mirror commit to cheesetv-tv main.
-6. **Smoke test:**
-   - Start a card checkout on /signup.html and on /renew.html. Check that a `card_checkouts` row appears and that the browser lands on the right PayMeGate link.
-   - A real paid order (or a `pmg_test_` sandbox key with a sandbox webhook) should send a Telegram alert to 6744659892 marked NEW or RENEWAL.
-
-Telegram: `GROK795_BOT_TOKEN` env if set, otherwise the existing Vault `grok795_bot_token` via `tg_secrets()`.
-NEW alerts include the existing `sp:<id>` button. Steve creates the line, replies `username password`, and the existing tg-webhook emails the login.
+- **DB:** migration `paymegate_card_checkout` and `paymegate_events_alert_ok`, applied. Adds `card_checkouts`, `paymegate_events`, the `start_card_checkout` RPC (anon) and `pmg_secrets()` (service_role only). The Zelle alert triggers now fire only for `status='pending'`.
+- **Function:** `paymegate-webhook` deployed with verify_jwt off. The HMAC signature is the authentication. GET/HEAD return 200 for PayMeGate's reachability probe.
+- **Webhook:** set with `PUT /v1/webhook` and subscribed to `order.paid`. The signing secret was returned once and piped straight into Vault as `paymegate_webhook_secret`; it was never printed. There was no CLI or management token for function env secrets. The function also accepts a `PAYMEGATE_WEBHOOK_SECRET` env override.
+- **Telegram:** uses `GROK795_BOT_TOKEN` env or Vault `grok795_bot_token`, and sends only to chat 6744659892. `paymegate_events.alert_ok` records whether Telegram accepted each alert.
+- **Back URL:** the dashboard's Custom Checkout setting (account-wide; there's no API for it) should be `https://watchcheesetv.com/thank-you.html`.
+- **Test without charging:** sign an event in SQL with the Vault secret (`extensions.hmac(ts||'.'||body::text, secret, 'sha256')`, base64url) and post it with `net.http_post`. Set `livemode:false` so the alert is marked [TEST].
+- **tg-webhook:** copied to `supabase/functions/tg-webhook/` (v2). The welcome email now mentions card renewals.
