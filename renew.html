@@ -19,7 +19,7 @@ input:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6rem;margin-to
 <h3>1. Your account</h3>
 <label for="u">CheeseTV username</label><input id="u" autocomplete="username" required maxlength="64">
 <label for="n">Your name</label><input id="n" autocomplete="name" required maxlength="80">
-<label for="c" id="cl">Phone or email (so we can reach you)</label><input id="c" required maxlength="120">
+<label for="c" id="cl">Email (required: updates and your receipt go here)</label><input id="c" type="email" autocomplete="email" required maxlength="120">
 <h3 style="margin-top:1.4rem">2. How many connections?</h3>
 <!-- PRICES: edit data-price and the text below -->
 <div class="opts" id="opts">
@@ -53,7 +53,7 @@ document.querySelectorAll('input[name=k]').forEach(r=>r.onchange=upd);$('u').oni
 function cp(t,b){navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1500)});}
 const isCard=()=>document.querySelector('input[name=pm]:checked').value==='card';
 function updPm(){const c=isCard();document.querySelectorAll('#pm .opt').forEach(o=>o.classList.toggle('on',o.querySelector('input').checked));
-$('cardbox').hidden=!c;$('zbox').hidden=c;$('cl').textContent=c?'Email (for your receipt)':'Phone or email (so we can reach you)';$('c').type=c?'email':'text';}
+$('cardbox').hidden=!c;$('zbox').hidden=c;}
 document.querySelectorAll('input[name=pm]').forEach(r=>r.onchange=updPm);
 {const q=new URLSearchParams(location.search),k=q.get('plan');const r=k&&document.querySelector('input[name=k][value="'+k+'"]');if(r){r.checked=true;upd()}
  if(q.get('pay')==='card'){document.querySelector('input[name=pm][value=card]').checked=true;updPm()}}
@@ -66,7 +66,8 @@ $('gocard').onclick=async()=>{const m=$('m2');m.className='msg';const u=$('u').v
 $('ca').onclick=e=>cp(amt,e.target);$('cm').onclick=e=>cp($('zm').textContent,e.target);
 $('f').onsubmit=async e=>{e.preventDefault();if(isCard()){$('gocard').click();return}const m=$('m');m.className='msg';
 const u=$('u').value.trim(),n=$('n').value.trim(),c=$('c').value.trim();
-if(u.length<2||n.length<2||c.length<5){m.className='msg err';m.textContent='Please fill in your username, name and phone or email.';return}
+if(u.length<2||n.length<2){m.className='msg err';m.textContent='Please fill in your username and name.';return}
+if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c)){m.className='msg err';m.textContent='Please enter a valid email.';return}
 $('go').disabled=true;m.textContent='Sending…';
 try{const r=await fetch(SB+'/rest/v1/rpc/submit_renewal',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
 body:JSON.stringify({p_username:u,p_name:n,p_contact:c,p_connections:+document.querySelector('input[name=k]:checked').value})});

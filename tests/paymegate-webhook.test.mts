@@ -7,9 +7,9 @@ function env(rows: any[] = []) {
   const db = async (path: string, init: any = {}) => {
     calls.push({ path, method: init.method || "GET", body: init.body ? JSON.parse(init.body) : null });
     if (path === "paymegate_events" && init.method === "POST") { const e = JSON.parse(init.body).event_id; if (events.has(e)) return { ok: false, status: 409, data: null }; events.add(e); return { ok: true, status: 201, data: null }; }
-    if (path.startsWith("card_checkouts?select")) { const u = new URL("http://x/" + path); const em = decodeURIComponent(u.searchParams.get("email")!.slice(3));
+    if (path.startsWith("card_checkouts?select")) { const u = new URL("http://x/" + path); const emq = u.searchParams.get("email"); const em = emq ? decodeURIComponent(emq.slice(3)) : null;
       const k = u.searchParams.get("kind")?.slice(3); const n = u.searchParams.get("connections")?.slice(3);
-      return { ok: true, status: 200, data: rows.filter(r => r.email === em && (!k || r.kind === k) && (!n || String(r.connections) === n)) }; }
+      return { ok: true, status: 200, data: rows.filter(r => (em === null || r.email === em) && (!k || r.kind === k) && (!n || String(r.connections) === n)) }; }
     if ((path === "signup_requests" || path === "renewal_requests") && init.method === "POST") return { ok: true, status: 201, data: [{ id: ++id }] };
     return { ok: true, status: 204, data: null };
   };
@@ -39,7 +39,7 @@ test("renewal: username from site form, marked RENEWAL, Zelle-free insert as pai
   const r = await e.h(await req(ev())); assert.equal(r.status, 200);
   const ins = e.calls.find(c => c.path === "renewal_requests"); assert.equal(ins.body.username, "jdoe22"); assert.equal(ins.body.status, "paid"); assert.equal(ins.body.contact, "buyer@example.com");
   assert.equal(e.tg.length, 1); const t = e.tg[0].b; assert.equal(t.chat_id, OWNER);
-  assert.match(t.text, /RENEWAL paid by card/); assert.match(t.text, /Username: jdoe22/); assert.match(t.text, /2 connections/); assert.match(t.text, /\$19\.99 USD/); assert.match(t.text, /buyer@example\.com/);
+  assert.match(t.text, /RENEWAL paid by card/); assert.match(t.text, /Username: jdoe22/); assert.match(t.text, /2 connections/); assert.match(t.text, /\$19\.99 USD/); assert.match(t.text, /buyer@example\.com/); assert.match(t.text, /Order ref: CARD-9cb50d55 · buyer@example\.com/);
   assert.ok(e.calls.some(c => c.path === "card_checkouts?id=eq.7" && c.method === "PATCH"));
   const r2 = await e.h(await req(ev())); assert.equal(r2.status, 200); assert.equal(e.tg.length, 1, "duplicate delivery must not alert twice");
 });
@@ -57,6 +57,12 @@ test("renewal paid without site form: still alerts, asks for username", async ()
 test("non-CheeseTV product: unknown type alert, no rows inserted", async () => {
   const e = env(); await e.h(await req(ev({ id: "33333333-3333-4333-8333-333333333333", metadata: {} , amount: "50.00"})));
   assert.match(e.tg[0].b.text, /Card payment received/); assert.ok(!e.calls.some(c => c.path === "signup_requests" || c.path === "renewal_requests"));
+});
+test("email changed at checkout: flagged likely match keeps username", async () => {
+  const e = env([{ id: 8, kind: "renewal", connections: 2, email: "old@example.com", username: "jdoe22", customer_name: "J" }]);
+  // mock ignores created_at; the fallback query has no email filter
+  await e.h(await req(ev({ id: "55555555-5555-4555-8555-555555555555", customerEmail: "new@example.com" })));
+  const t = e.tg[0].b.text; assert.match(t, /Email: new@example\.com/); assert.match(t, /Site form email was old@example\.com/); assert.match(t, /Username: jdoe22/);
 });
 test("event id header must match body", async () => {
   const e = env(); const r = await e.h(await req(ev(), { id: "44444444-4444-4444-8444-444444444444" })); assert.equal(r.status, 400); assert.equal(e.tg.length, 0);

@@ -36,15 +36,16 @@ export async function verify(secret: string, ts: string | null, sig: string | nu
 
 const plural = (n: number) => `${n} connection${n === 1 ? "" : "s"}`;
 export function alertText(o: { kind: "new" | "renewal" | "unknown"; n: number | null; amount: string; currency: string; email: string;
-  username?: string | null; name?: string | null; phone?: string | null; device?: string | null; order: string; ref?: number | null; test?: boolean }) {
+  username?: string | null; name?: string | null; phone?: string | null; device?: string | null; order: string; ref?: number | null; test?: boolean; siteEmail?: string | null }) {
   const head = o.kind === "renewal" ? "🔁 RENEWAL paid by card" : o.kind === "new" ? "🆕 NEW customer paid by card" : "💳 Card payment received";
   const lines = [`${o.test ? "[TEST] " : ""}${head}${o.ref ? ` #${o.ref}` : ""}`,
     `Plan: ${o.n ? plural(o.n) : "?"} · 1 month`, `Amount: $${o.amount} ${o.currency}`, `Email: ${o.email}`];
+  if (o.siteEmail && o.siteEmail !== o.email) lines.push(`⚠️ Site form email was ${o.siteEmail} (different from checkout). Details below are a likely match; double-check.`);
   if (o.kind === "renewal") lines.push(`Username: ${o.username || "not given (ask the customer)"}`);
   if (o.name) lines.push(`Name: ${o.name}`);
   if (o.phone) lines.push(`Phone: ${o.phone}`);
   if (o.device) lines.push(`Device: ${o.device}`);
-  lines.push(`Order: ${o.order}`, "");
+  lines.push(`Order ref: CARD-${o.order.slice(0, 8)} · ${o.email}`, `Order: ${o.order}`, "");
   lines.push(o.kind === "renewal" ? `Verified by PayMeGate. Extend ${o.username || "the customer's line"} by 1 month on BQ Panel.`
     : o.kind === "new" ? "Verified by PayMeGate. Create the login, then tap the button and reply with username and password to email it."
     : "Verified by PayMeGate, but no matching sign-up/renew form was found. Email the customer to ask if this is new or a renewal.");
@@ -78,7 +79,15 @@ export function makeHandler(d: Deps) {
     let q = `card_checkouts?select=*&paid_at=is.null&email=eq.${encodeURIComponent(email)}&created_at=gte.${encodeURIComponent(since)}&order=created_at.desc&limit=1`;
     if (fromMeta) q += `&kind=eq.${fromMeta}`;
     if (n) q += `&connections=eq.${n}`;
-    const co = (await d.db(q)).data?.[0] ?? null;
+    let co = (await d.db(q)).data?.[0] ?? null;
+    // Customer may have changed the email on the checkout page: fall back to the newest unpaid site form
+    // for the same type and plan in the last 2 hours, and flag it so Steve double-checks.
+    let siteEmail: string | null = null;
+    if (!co && fromMeta && n) {
+      const since2 = new Date(now() - 2 * 3600e3).toISOString();
+      co = (await d.db(`card_checkouts?select=*&paid_at=is.null&kind=eq.${fromMeta}&connections=eq.${n}&created_at=gte.${encodeURIComponent(since2)}&order=created_at.desc&limit=1`)).data?.[0] ?? null;
+      if (co) siteEmail = co.email;
+    }
     const kind: "new" | "renewal" | "unknown" = fromMeta ?? co?.kind ?? "unknown";
     const test = ev.livemode === false;
     const paidAt = ev.paidAt || new Date(now()).toISOString();
@@ -104,7 +113,7 @@ export function makeHandler(d: Deps) {
       ...(kind === "new" ? { signup_id: ref } : kind === "renewal" ? { renewal_id: ref } : {}) }) });
 
     await d.telegram("sendMessage", { chat_id: OWNER, text: alertText({ kind, n, amount: String(ev.amount), currency: ev.currency || "USD", email,
-      username: co?.username, name: co?.customer_name, phone: co?.phone, device: co?.device, order: ev.orderUUID, ref, test }),
+      username: co?.username, name: co?.customer_name, phone: co?.phone, device: co?.device, order: ev.orderUUID, ref, test, siteEmail }),
       ...(markup ? { reply_markup: markup } : {}) });
     return new Response("ok", { status: 200 });
   };
