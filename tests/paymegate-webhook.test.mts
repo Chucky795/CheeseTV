@@ -8,8 +8,8 @@ function env(rows: any[] = []) {
     calls.push({ path, method: init.method || "GET", body: init.body ? JSON.parse(init.body) : null });
     if (path === "paymegate_events" && init.method === "POST") { const e = JSON.parse(init.body).event_id; if (events.has(e)) return { ok: false, status: 409, data: null }; events.add(e); return { ok: true, status: 201, data: null }; }
     if (path.startsWith("card_checkouts?select")) { const u = new URL("http://x/" + path); const emq = u.searchParams.get("email"); const em = emq ? decodeURIComponent(emq.slice(3)) : null;
-      const k = u.searchParams.get("kind")?.slice(3); const n = u.searchParams.get("connections")?.slice(3);
-      return { ok: true, status: 200, data: rows.filter(r => (em === null || r.email === em) && (!k || r.kind === k) && (!n || String(r.connections) === n)) }; }
+      const k = u.searchParams.get("kind")?.slice(3); const idq = u.searchParams.get("id")?.slice(3); const n = u.searchParams.get("connections")?.slice(3);
+      return { ok: true, status: 200, data: rows.filter(r => (!idq || String(r.id) === idq) && (em === null || r.email === em) && (!k || r.kind === k) && (!n || String(r.connections) === n)) }; }
     if ((path === "signup_requests" || path === "renewal_requests") && init.method === "POST") return { ok: true, status: 201, data: [{ id: ++id }] };
     return { ok: true, status: 204, data: null };
   };
@@ -66,4 +66,15 @@ test("email changed at checkout: flagged likely match keeps username", async () 
 });
 test("event id header must match body", async () => {
   const e = env(); const r = await e.h(await req(ev(), { id: "44444444-4444-4444-8444-444444444444" })); assert.equal(r.status, 400); assert.equal(e.tg.length, 0);
+});
+test("order checkout: exact match by metadata.checkout_id even with a different email", async () => {
+  const e = env([{ id: 7, kind: "renewal", connections: 2, email: "other@example.com", username: "wrong" }, { id: 12, kind: "renewal", connections: 2, email: "site@example.com", username: "exact1" }]);
+  await e.h(await req(ev({ id: "66666666-6666-4666-8666-666666666666", externalId: "ctv-12", metadata: { app: "cheesetv", type: "renewal", connections: "2", months: "1", checkout_id: "12", username: "exact1" } })));
+  const t = e.tg[0].b.text; assert.match(t, /Username: exact1/); assert.match(t, /Site form email was site@example\.com/);
+  assert.ok(e.calls.some(c => c.path === "card_checkouts?id=eq.12" && c.method === "PATCH"));
+});
+test("order checkout: externalId ctv-<id> works without metadata.checkout_id", async () => {
+  const e = env([{ id: 12, kind: "renewal", connections: 2, email: "buyer@example.com", username: "ext12" }]);
+  await e.h(await req(ev({ id: "77777777-7777-4777-8777-777777777777", externalId: "ctv-12" })));
+  assert.match(e.tg[0].b.text, /Username: ext12/); assert.doesNotMatch(e.tg[0].b.text, /Site form email was/);
 });

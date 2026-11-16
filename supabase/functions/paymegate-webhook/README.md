@@ -7,3 +7,10 @@
 - **Back URL:** the dashboard's Custom Checkout setting (account-wide; there's no API for it) should be `https://watchcheesetv.com/thank-you.html`.
 - **Test without charging:** sign an event in SQL with the Vault secret (`extensions.hmac(ts||'.'||body::text, secret, 'sha256')`, base64url) and post it with `net.http_post`. Set `livemode:false` so the alert is marked [TEST].
 - **tg-webhook:** copied to `supabase/functions/tg-webhook/` (v2). The welcome email now mentions card renewals.
+
+## Branded order checkout (paymegate-checkout, live 2026-11-15)
+The site POSTs the form to `functions/v1/paymegate-checkout` (verify_jwt off). It calls `start_card_checkout`, then
+`POST /v1/orders` with externalId `ctv-<id>`, metadata.checkout_id, a per-order backUrl (thank-you, `?renew=1` for renewals)
+and a 2 h expiry, and returns the branded `/pay/<order>` URL (logo badge + Return to Cheese TV). Key: Vault
+`paymegate_api_key` via `pmg_secrets().api`. On failure the site falls back to the public product link. The webhook
+matches exactly by checkout_id / externalId before the email match.

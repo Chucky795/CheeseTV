@@ -1,4 +1,4 @@
-/* CheeseTV card checkout (PayMeGate hosted checkout). Public product links only: no API key here.
+/* CheeseTV card checkout (PayMeGate). Orders are created server-side (paymegate-checkout); product links are the fallback. No API key here.
    Card, Apple Pay, Google Pay, PayPal, Cash App and Venmo are handled on PayMeGate's page.
    Prices are fixed on PayMeGate (price override disabled), so the link can't be used to pay less. */
 (function(w){
@@ -47,18 +47,30 @@ function confirmBox(o){return new Promise(res=>{
  el.addEventListener('click',e=>{const a=e.target.closest('[data-a]');if(a)done(a.dataset.a==='yes');else if(e.target===el)done(false)});
  document.addEventListener('keydown',key);document.body.appendChild(el);document.body.style.overflow='hidden';el.querySelector('.cpm-go').focus({preventScroll:true});el.scrollTop=0;
 })}
-/* Shows the CheeseTV confirmation, records who is paying (so the payment alert can show the username for
-   renewals), then opens checkout. If saving fails we still open checkout: the alert then shows the email only.
+/* Shows the CheeseTV confirmation, then asks our server (paymegate-checkout) to create a PayMeGate order: that page
+   shows the CheeseTV logo badge and a "Return to Cheese TV" link. The server also records who is paying (so the alert
+   shows the username for renewals). If the server can't create the order we fall back to the public product link.
    Resolves false if the customer goes back. */
 async function start(o){
  if(o.confirm!==false&&!(await confirmBox(o)))return false;
  const kind=o.kind==='renewal'?'renewal':'new',n=+o.connections;
- let ref=null;
- try{const r=await fetch(SB+'/rest/v1/rpc/start_card_checkout',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
-   body:JSON.stringify({p_kind:kind,p_connections:n,p_email:o.email,p_name:o.name||null,p_phone:o.phone||null,p_device:o.device||null,p_username:o.username||null})});
-  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||'save failed');ref=j.id}
- catch(e){if(o.strict)throw e}
- try{localStorage.setItem('ctv_checkout',JSON.stringify({kind,n,email:o.email,username:o.username||null,ref,t:Date.now()}))}catch(e){}
+ const save=ref=>{try{localStorage.setItem('ctv_checkout',JSON.stringify({kind,n,email:o.email,username:o.username||null,ref,t:Date.now()}))}catch(e){}};
+ let ref=null,j=null;
+ try{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),15000);
+  const r=await fetch(SB+'/functions/v1/paymegate-checkout',{method:'POST',signal:ac.signal,headers:{apikey:KEY,'Content-Type':'application/json'},
+   body:JSON.stringify({kind,connections:n,email:o.email,name:o.name||null,phone:o.phone||null,device:o.device||null,username:o.username||null})});
+  clearTimeout(tm);j=await r.json().catch(()=>null);
+  if(r.ok&&j&&/^https:\/\/www\.paymegate\.com\/pay\/[0-9a-f-]{36}$/.test(j.url||'')){save(j.id);w.location.href=j.url;return true}
+  if(j&&j.id)ref=j.id;
+  else if(r.status===400&&j&&j.error&&o.strict)throw new Error(j.error);
+ }catch(e){if(o.strict)throw e}
+ if(ref==null){
+  try{const r=await fetch(SB+'/rest/v1/rpc/start_card_checkout',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({p_kind:kind,p_connections:n,p_email:o.email,p_name:o.name||null,p_phone:o.phone||null,p_device:o.device||null,p_username:o.username||null})});
+   const k=await r.json().catch(()=>({}));if(!r.ok)throw new Error(k.message||'save failed');ref=k.id}
+  catch(e){if(o.strict)throw e}
+ }
+ save(ref);
  w.location.href=url(kind,n,o.email,o.checkoutName||o.name);
  return true;
 }

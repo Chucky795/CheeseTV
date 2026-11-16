@@ -36,11 +36,11 @@ export async function verify(secret: string, ts: string | null, sig: string | nu
 
 const plural = (n: number) => `${n} connection${n === 1 ? "" : "s"}`;
 export function alertText(o: { kind: "new" | "renewal" | "unknown"; n: number | null; amount: string; currency: string; email: string;
-  username?: string | null; name?: string | null; phone?: string | null; device?: string | null; order: string; ref?: number | null; test?: boolean; siteEmail?: string | null }) {
+  username?: string | null; name?: string | null; phone?: string | null; device?: string | null; order: string; ref?: number | null; test?: boolean; siteEmail?: string | null; exact?: boolean }) {
   const head = o.kind === "renewal" ? "🔁 RENEWAL paid by card" : o.kind === "new" ? "🆕 NEW customer paid by card" : "💳 Card payment received";
   const lines = [`${o.test ? "[TEST] " : ""}${head}${o.ref ? ` #${o.ref}` : ""}`,
     `Plan: ${o.n ? plural(o.n) : "?"} · 1 month`, `Amount: $${o.amount} ${o.currency}`, `Email: ${o.email}`];
-  if (o.siteEmail && o.siteEmail !== o.email) lines.push(`⚠️ Site form email was ${o.siteEmail} (different from checkout). Details below are a likely match; double-check.`);
+  if (o.siteEmail && o.siteEmail !== o.email) lines.push(o.exact ? `ℹ️ Site form email was ${o.siteEmail} (customer used a different email at checkout). Matched by order, details are exact.` :`⚠️ Site form email was ${o.siteEmail} (different from checkout). Details below are a likely match; double-check.`);
   if (o.kind === "renewal") lines.push(`Username: ${o.username || "not given (ask the customer)"}`);
   if (o.name) lines.push(`Name: ${o.name}`);
   if (o.phone) lines.push(`Phone: ${o.phone}`);
@@ -74,15 +74,20 @@ export function makeHandler(d: Deps) {
       body: JSON.stringify({ event_id: eventId, order_uuid: ev.orderUUID, amount: ev.amount, currency: ev.currency, customer_email: email, kind: fromMeta, connections: n, payload: ev }) });
     if (!ins.ok) return new Response(ins.status === 409 ? "duplicate" : "db error", { status: ins.status === 409 ? 200 : 500 });
 
-    // Newest unpaid site checkout for this email (same type and plan when known), within 48 h.
+    // Exact match first: orders created by paymegate-checkout carry metadata.checkout_id and externalId "ctv-<id>".
+    const cidRaw = String(md.checkout_id ?? "") || (/^ctv-(\d+)$/.exec(String(ev.externalId ?? ""))?.[1] ?? "");
+    const cid = /^\d{1,12}$/.test(cidRaw) ? cidRaw : null;
+    let co = cid ? ((await d.db(`card_checkouts?select=*&id=eq.${cid}&paid_at=is.null&limit=1`)).data?.[0] ?? null) : null;
+    const exact = !!co;
+    let siteEmail: string | null = co && co.email && co.email !== email ? co.email : null;
+    // Otherwise: newest unpaid site checkout for this email (same type and plan when known), within 48 h.
     const since = new Date(now() - 48 * 3600e3).toISOString();
     let q = `card_checkouts?select=*&paid_at=is.null&email=eq.${encodeURIComponent(email)}&created_at=gte.${encodeURIComponent(since)}&order=created_at.desc&limit=1`;
     if (fromMeta) q += `&kind=eq.${fromMeta}`;
     if (n) q += `&connections=eq.${n}`;
-    let co = (await d.db(q)).data?.[0] ?? null;
+    if (!co) co = (await d.db(q)).data?.[0] ?? null;
     // Customer may have changed the email on the checkout page: fall back to the newest unpaid site form
     // for the same type and plan in the last 2 hours, and flag it so Steve double-checks.
-    let siteEmail: string | null = null;
     if (!co && fromMeta && n) {
       const since2 = new Date(now() - 2 * 3600e3).toISOString();
       co = (await d.db(`card_checkouts?select=*&paid_at=is.null&kind=eq.${fromMeta}&connections=eq.${n}&created_at=gte.${encodeURIComponent(since2)}&order=created_at.desc&limit=1`)).data?.[0] ?? null;
@@ -113,7 +118,7 @@ export function makeHandler(d: Deps) {
       ...(kind === "new" ? { signup_id: ref } : kind === "renewal" ? { renewal_id: ref } : {}) }) });
 
     const tr: any = await d.telegram("sendMessage", { chat_id: OWNER, text: alertText({ kind, n, amount: String(ev.amount), currency: ev.currency || "USD", email,
-      username: co?.username, name: co?.customer_name, phone: co?.phone, device: co?.device, order: ev.orderUUID, ref, test, siteEmail }),
+      username: co?.username, name: co?.customer_name, phone: co?.phone, device: co?.device, order: ev.orderUUID, ref, test, siteEmail, exact }),
       ...(markup ? { reply_markup: markup } : {}) });
     await d.db(`paymegate_events?event_id=eq.${eventId}`, { method: "PATCH", body: JSON.stringify({ alert_ok: !!tr?.ok }) });
     return new Response("ok", { status: 200 });
