@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sign up | CheeseTV</title>
-<link rel="stylesheet" href="styles.css?v=20261101a"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="stylesheet" href="styles.css?v=20261116"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <style>
 .rn{max-width:520px;margin:auto;padding:2rem 0 4rem}.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:20px;padding:1.4rem;margin-top:1.2rem}
 label{display:block;font-weight:600;font-size:.9rem;margin:.9rem 0 .3rem}input,select{width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);background:#060c1c;color:var(--tx);font-size:1rem}
@@ -14,7 +14,7 @@ input:focus,select:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6
 <header class="nav"><div class="wrap nav-in"><a class="logo" href="/">🧀 Cheese<span>TV</span></a><a class="btn sm ghost" href="/">Home</a></div></header>
 <main class="wrap rn">
 <p class="eyebrow">New customers</p><h2>Sign up for CheeseTV</h2>
-<p class="sub" style="margin-bottom:0">Pick a plan, pay with Zelle, and we'll email your login and setup steps as soon as we confirm your payment.</p>
+<p class="sub" style="margin-bottom:0">Pick a plan, pay with Zelle or card, and we'll email your login and setup steps within 1–3 hours of your payment.</p><p class="nc">Already a customer? <a href="/renew.html">Renew here</a> instead.</p>
 <form id="f" class="card" novalidate>
 <h3>1. About you</h3>
 <label for="n">Your name</label><input id="n" autocomplete="name" required maxlength="80">
@@ -30,6 +30,12 @@ input:focus,select:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6
 <label class="opt"><span><input type="radio" name="k" value="3" data-price="27.99">3 connections</span><b>$27.99/month</b></label>
 </div>
 <p class="nc">✓ Pay as you go, no contract · Free setup</p>
+<h3 style="margin-top:1.4rem">3. How do you want to pay?</h3>
+<div class="opts" id="pm">
+<label class="opt on"><span><input type="radio" name="pm" value="zelle" checked>Zelle</span><b>From your bank app</b></label>
+<label class="opt"><span><input type="radio" name="pm" value="card">💳 Card · Apple Pay · Google Pay</span><b>Secure checkout</b></label>
+</div>
+<p class="nc" id="cardnote" hidden>You'll go to our secure checkout page (PayMeGate) to pay by card, Apple Pay, Google Pay, PayPal, Cash App or Venmo. It's a one-time payment for one month, not a subscription, so you renew each month. We email your login within 1–3 hours. No refunds, so try the <a href="/trial.html">free 12-hour trial</a> first.</p>
 <div class="total"><span>Total this month</span><b id="t">$14.99</b></div>
 <button class="btn lg block" style="margin-top:1.4rem" id="go">Continue to payment</button>
 <p class="msg" id="m" role="status"></p>
@@ -39,14 +45,21 @@ input:focus,select:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6
 <p class="zl">Send <code id="za"></code> via Zelle to <b>cheesetv795@gmail.com</b> and put this code in the memo: <code id="zm"></code></p>
 <div class="cp"><button type="button" class="btn sm ghost" id="ca">Copy amount</button><button type="button" class="btn sm ghost" id="cm">Copy memo</button></div>
 <p class="zl" style="margin-top:1rem">That's it! Once we see your payment, we'll email your username, password and setup steps to <b id="ze"></b>. Usually the same day.</p>
-<p class="nc">We only take Zelle. We'll never ask for a card.</p>
+<p class="nc">We never ask for card details by email, text or chat. Card payments only happen on our secure checkout page.</p>
 </div></main>
+<script src="assets/cardpay.js?v=1"></script>
 <script>
 const SB="https://vrmtxrtzweblakuvkwoe.supabase.co",KEY="sb_publishable_zvptRN1xVVYyt6jP1B-5vA_netcK9Vm";
 const $=id=>document.getElementById(id);let amt="14.99";
 function upd(){const r=document.querySelector('input[name=k]:checked');amt=r.dataset.price;
 document.querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.contains(r)));$('t').textContent='$'+amt;}
 document.querySelectorAll('input[name=k]').forEach(r=>r.onchange=upd);
+const isCard=()=>document.querySelector('input[name=pm]:checked').value==='card';
+function updPm(){const c=isCard();document.querySelectorAll('#pm .opt').forEach(o=>o.classList.toggle('on',o.querySelector('input').checked));
+$('cardnote').hidden=!c;$('go').textContent=c?'Continue to secure checkout':'Continue to payment';}
+document.querySelectorAll('input[name=pm]').forEach(r=>r.onchange=updPm);
+{const q=new URLSearchParams(location.search),k=q.get('plan');const r=k&&document.querySelector('input[name=k][value="'+k+'"]');if(r){r.checked=true;upd()}
+ if(q.get('pay')==='card'){document.querySelector('input[name=pm][value=card]').checked=true;updPm()}}
 function cp(t,b){navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1500)});}
 $('f').onsubmit=async e=>{e.preventDefault();const m=$('m');m.className='msg';
 const n=$('n').value.trim(),em=$('e').value.trim(),p=$('p').value.trim(),d=$('d').value;
@@ -54,6 +67,10 @@ if(n.length<2){m.className='msg err';m.textContent='Please enter your name.';ret
 if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){m.className='msg err';m.textContent='Please enter a valid email.';return}
 if(!d){m.className='msg err';m.textContent='Please choose your device.';return}
 $('go').disabled=true;m.textContent='Sending…';
+if(isCard()){m.textContent='Opening secure checkout…';
+ try{await CardPay.start({kind:'new',connections:+document.querySelector('input[name=k]:checked').value,email:em,name:n,phone:p,device:d})}
+ catch(x){m.className='msg err';m.textContent='Could not open checkout. Please try again.';$('go').disabled=false}
+ return}
 try{const r=await fetch(SB+'/rest/v1/rpc/submit_signup',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
 body:JSON.stringify({p_name:n,p_email:em,p_phone:p,p_device:d,p_connections:+document.querySelector('input[name=k]:checked').value})});
 const j=await r.json();if(!r.ok)throw new Error(j.message||'Something went wrong');
@@ -62,5 +79,5 @@ $('za').textContent='$'+j.amount;$('zm').textContent=j.memo;$('ze').textContent=
 $('ca').onclick=e=>cp(String(j.amount),e.target);$('cm').onclick=e=>cp(j.memo,e.target);
 $('f').querySelectorAll('input,select').forEach(x=>x.disabled=true);$('pay').hidden=false;$('pay').scrollIntoView({behavior:'smooth'});}
 catch(x){m.className='msg err';m.textContent=x.message+'. Please try again.';$('go').disabled=false}};
-</script><script src="assets/chatbot.js" defer></script>
+</script><script src="assets/chatbot.js?v=20261116" defer></script>
 <script src="/assets/visit.js" defer></script></body></html>

@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thank you | CheeseTV</title><meta name="robots" content="noindex"><meta name="description" content="Thanks for your CheeseTV payment.">
+<link rel="stylesheet" href="styles.css?v=20261116"><link rel="stylesheet" href="assets/christmas.css?v=20261108"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<style>
+.ty{max-width:640px;margin:auto;padding:2rem 0 4rem;text-align:center}.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:20px;padding:1.4rem;margin-top:1.2rem;text-align:left}
+.ty .tyhero img{width:96px;height:auto}.ty h1{margin:.6rem 0 .4rem}.big{font-size:3rem;line-height:1}.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:.6rem 0 .6rem 2.8rem;line-height:1.6}.steps li:before{content:counter(s);position:absolute;left:0;top:.55rem;width:2rem;height:2rem;border-radius:50%;background:var(--gold);color:#111;font-weight:800;display:flex;align-items:center;justify-content:center}
+.who{color:var(--gold2);font-weight:700;word-break:break-all}.row{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:1.2rem}.small{color:var(--mut);font-size:.88rem;margin-top:1.4rem}
+</style></head><body>
+<header class="nav"><div class="wrap nav-in"><a class="logo" href="/"><img src="assets/logo-112.png" alt="CheeseTV" width="48" height="52" class="logo-img"><b>Cheese<span>TV</span></b></a><a class="btn sm ghost" href="/">Home</a></div></header>
+<main class="wrap ty">
+<section class="tyhero"><div class="big">🎄✅</div><h1>Thank you for your payment!</h1>
+<p class="sub" id="lead">Your CheeseTV payment was received.</p></section>
+
+<section class="card" id="newbox"><h2>What happens next</h2><ol class="steps">
+<li>We set up your CheeseTV login. <b>Please allow 1–3 hours.</b></li>
+<li>We email your username, password and setup steps<span id="newmail"></span>. Check your spam folder too.</li>
+<li>Install CheeseTV on your device. See <a href="/#download">Download the App</a> or watch in your browser at <a href="http://live.watchcheesetv.com/">live.watchcheesetv.com</a>.</li></ol></section>
+
+<section class="card" id="renbox" hidden><h2>Your renewal</h2><ol class="steps">
+<li>We add one month to your existing login<span id="renuser"></span>. <b>Please allow 1–3 hours.</b></li>
+<li><b>No new login needed.</b> Keep using the same username and password on all your devices.</li>
+<li>Your receipt goes to<span id="renmail"> your email</span>.</li></ol></section>
+
+<section class="card"><h2>Need help?</h2><p>Email us at <a href="mailto:cheesetv795@gmail.com">cheesetv795@gmail.com</a> or use the <a href="/#contact">contact form</a>. Include the email you paid with so we can find your order fast.</p>
+<div class="row"><a class="btn" href="/">Back to CheeseTV</a><a class="btn ghost" href="/#download">⬇ Download the App</a></div></section>
+<p class="small">Card payments are a one-time payment for one month, not a subscription, so renew each month on the <a href="/renew.html">renew page</a>. Didn't finish paying? Your plan starts only after the payment goes through, so you can <a href="/#plans">go back to plans</a>.</p>
+</main>
+<footer class="foot"><div class="wrap f-bot">© 2026 CheeseTV · <a href="/">Home</a> · <a href="/pay.html">How to pay</a> · <a href="/privacy.html">Privacy Policy</a></div></footer>
+<script>
+(function(){let c=null;try{c=JSON.parse(localStorage.getItem('ctv_checkout')||'null')}catch(e){}
+if(c&&!(Date.now()-c.t<48*3600e3))c=null;
+const q=new URLSearchParams(location.search);const renew=q.get('renew')==='1'||(!q.has('renew')&&c&&c.kind==='renewal');
+const $=id=>document.getElementById(id);
+if(renew){$('newbox').hidden=true;$('renbox').hidden=false;$('lead').textContent='Your CheeseTV renewal payment was received.';
+ if(c&&c.username){$('renuser').textContent=' ('+c.username+')'}if(c&&c.email){$('renmail').textContent=' '+c.email}}
+else if(c&&c.email){$('newmail').textContent=' to '+c.email}
+document.title=(renew?'Renewal received':'Thank you')+' | CheeseTV';})();
+</script>
+<script src="assets/christmas.js?v=20261108" defer></script>
+<script src="/assets/visit.js" defer></script></body></html>

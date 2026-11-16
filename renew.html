@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Renew my service | CheeseTV</title>
-<link rel="stylesheet" href="styles.css?v=20261101a"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="stylesheet" href="styles.css?v=20261116"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <style>
 .rn{max-width:520px;margin:auto;padding:2rem 0 4rem}.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:20px;padding:1.4rem;margin-top:1.2rem}
 label{display:block;font-weight:600;font-size:.9rem;margin:.9rem 0 .3rem}input{width:100%;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--line);background:#060c1c;color:var(--tx);font-size:1rem}
@@ -14,12 +14,12 @@ input:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6rem;margin-to
 <header class="nav"><div class="wrap nav-in"><a class="logo" href="/">🧀 Cheese<span>TV</span></a><a class="btn sm ghost" href="/">Home</a></div></header>
 <main class="wrap rn">
 <p class="eyebrow">Returning customers</p><h2>Renew my service</h2>
-<p class="sub" style="margin-bottom:0">Pay with Zelle in 3 quick steps. We'll renew your account as soon as we confirm your payment.</p>
+<p class="sub" style="margin-bottom:0">Pay with Zelle or card in 3 quick steps. We'll add a month to your existing login within 1–3 hours of your payment. No new login needed.</p><p class="nc">New customer? <a href="/signup.html">Sign up here</a> instead.</p>
 <form id="f" class="card" novalidate>
 <h3>1. Your account</h3>
 <label for="u">CheeseTV username</label><input id="u" autocomplete="username" required maxlength="64">
 <label for="n">Your name</label><input id="n" autocomplete="name" required maxlength="80">
-<label for="c">Phone or email (so we can reach you)</label><input id="c" required maxlength="120">
+<label for="c" id="cl">Phone or email (so we can reach you)</label><input id="c" required maxlength="120">
 <h3 style="margin-top:1.4rem">2. How many connections?</h3>
 <!-- PRICES: edit data-price and the text below -->
 <div class="opts" id="opts">
@@ -29,12 +29,20 @@ input:focus{outline:2px solid var(--gold)}.opts{display:grid;gap:.6rem;margin-to
 </div>
 <p class="nc">✓ Pay as you go, no contract, cancel anytime</p>
 <div class="total"><span>Total this month</span><b id="t">$14.99</b></div>
-<h3 style="margin-top:1.4rem">3. Send with Zelle</h3><p class="nc">New to Zelle? <a href="/pay.html">See our step-by-step How to pay guide</a>.</p><p class="nc">⏱ Please allow 1–3 hours for your renewal to be applied after you pay.</p>
+<h3 style="margin-top:1.4rem">3. How do you want to pay?</h3>
+<div class="opts" id="pm">
+<label class="opt on"><span><input type="radio" name="pm" value="zelle" checked>Zelle</span><b>From your bank app</b></label>
+<label class="opt"><span><input type="radio" name="pm" value="card">💳 Card · Apple Pay · Google Pay</span><b>Secure checkout</b></label>
+</div>
+<div id="cardbox" hidden><p class="nc">You'll go to our secure checkout page (PayMeGate) to pay by card, Apple Pay, Google Pay, PayPal, Cash App or Venmo. It's a one-time payment for one month, not a subscription. We extend your existing login within 1–3 hours. No new login needed. No refunds.</p>
+<button type="button" class="btn lg block" style="margin-top:1rem" id="gocard">Continue to secure checkout</button><p class="msg" id="m2" role="status"></p></div>
+<div id="zbox"><h3 style="margin-top:1.4rem">Send with Zelle</h3><p class="nc">New to Zelle? <a href="/pay.html">See our step-by-step How to pay guide</a>.</p><p class="nc">⏱ Please allow 1–3 hours for your renewal to be applied after you pay.</p>
 <p class="zl">Send <code id="za">$14.99</code> via Zelle to <b>cheesetv795@gmail.com</b> with memo: <code id="zm">CheeseTV &lt;username&gt;</code></p>
 <div class="cp"><button type="button" class="btn sm ghost" id="ca">Copy amount</button><button type="button" class="btn sm ghost" id="cm">Copy memo</button></div>
-<button class="btn lg block" style="margin-top:1.4rem" id="go">I've sent the payment</button>
+<button class="btn lg block" style="margin-top:1.4rem" id="go">I've sent the payment</button></div>
 <p class="msg" id="m" role="status"></p>
 </form></main>
+<script src="assets/cardpay.js?v=1"></script>
 <script>
 const SB="https://vrmtxrtzweblakuvkwoe.supabase.co",KEY="sb_publishable_zvptRN1xVVYyt6jP1B-5vA_netcK9Vm";
 const $=id=>document.getElementById(id);let amt="14.99";
@@ -43,8 +51,20 @@ document.querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.contains(
 $('t').textContent=$('za').textContent='$'+amt;$('zm').textContent='CheeseTV '+($('u').value.trim()||'<username>');}
 document.querySelectorAll('input[name=k]').forEach(r=>r.onchange=upd);$('u').oninput=upd;
 function cp(t,b){navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1500)});}
+const isCard=()=>document.querySelector('input[name=pm]:checked').value==='card';
+function updPm(){const c=isCard();document.querySelectorAll('#pm .opt').forEach(o=>o.classList.toggle('on',o.querySelector('input').checked));
+$('cardbox').hidden=!c;$('zbox').hidden=c;$('cl').textContent=c?'Email (for your receipt)':'Phone or email (so we can reach you)';$('c').type=c?'email':'text';}
+document.querySelectorAll('input[name=pm]').forEach(r=>r.onchange=updPm);
+{const q=new URLSearchParams(location.search),k=q.get('plan');const r=k&&document.querySelector('input[name=k][value="'+k+'"]');if(r){r.checked=true;upd()}
+ if(q.get('pay')==='card'){document.querySelector('input[name=pm][value=card]').checked=true;updPm()}}
+$('gocard').onclick=async()=>{const m=$('m2');m.className='msg';const u=$('u').value.trim(),n=$('n').value.trim(),c=$('c').value.trim();
+ if(u.length<2||n.length<2){m.className='msg err';m.textContent='Please fill in your CheeseTV username and name.';return}
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c)){m.className='msg err';m.textContent='Please enter a valid email for your receipt.';return}
+ $('gocard').disabled=true;m.textContent='Opening secure checkout…';
+ try{await CardPay.start({kind:'renewal',connections:+document.querySelector('input[name=k]:checked').value,email:c,name:n,checkoutName:(n+' (user '+u+')').slice(0,128),username:u})}
+ catch(x){m.className='msg err';m.textContent='Could not open checkout. Please try again.';$('gocard').disabled=false}};
 $('ca').onclick=e=>cp(amt,e.target);$('cm').onclick=e=>cp($('zm').textContent,e.target);
-$('f').onsubmit=async e=>{e.preventDefault();const m=$('m');m.className='msg';
+$('f').onsubmit=async e=>{e.preventDefault();if(isCard()){$('gocard').click();return}const m=$('m');m.className='msg';
 const u=$('u').value.trim(),n=$('n').value.trim(),c=$('c').value.trim();
 if(u.length<2||n.length<2||c.length<5){m.className='msg err';m.textContent='Please fill in your username, name and phone or email.';return}
 $('go').disabled=true;m.textContent='Sending…';
@@ -53,5 +73,5 @@ body:JSON.stringify({p_username:u,p_name:n,p_contact:c,p_connections:+document.q
 const j=await r.json();if(!r.ok)throw new Error(j.message||'Something went wrong');
 m.className='msg ok';m.textContent='Thanks! Request #'+j.id+' received. We will renew your account once your Zelle payment of $'+j.amount+' arrives. Please allow 1–3 hours for your renewal to be applied.';}
 catch(x){m.className='msg err';m.textContent=x.message+'. Please try again.';$('go').disabled=false}};
-</script><script src="assets/chatbot.js" defer></script>
+</script><script src="assets/chatbot.js?v=20261116" defer></script>
 <script src="/assets/visit.js" defer></script></body></html>
