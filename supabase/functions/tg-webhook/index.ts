@@ -29,7 +29,7 @@ async function emailLogin(row: any, user: string, pass: string) {
 <li><b>Fire TV, Android TV, Google TV:</b> install the <i>Downloader</i> app, open it and enter <b>watchcheesetv.com/tv.apk</b>. Install, open CheeseTV and sign in with the login above.</li>
 <li><b>iPhone, iPad or computer:</b> open the web player at <a href="https://live.watchcheesetv.com">live.watchcheesetv.com</a> and sign in.</li>
 <li>More devices and help: <a href="https://watchcheesetv.com/#download">watchcheesetv.com</a></li></ul>
-<p>Pay as you go, no contract. To renew next month, go to <a href="https://watchcheesetv.com/renew.html">watchcheesetv.com/renew.html</a>, enter your username and pay by <b>card, Apple Pay or Google Pay</b> on our secure checkout, or by Zelle to cheesetv795@gmail.com. Renewals extend this same login, so there's no new login to set up.</p>
+<p>Pay as you go, no contract. To renew next month, go to <a href="https://watchcheesetv.com/renew.html">watchcheesetv.com/renew.html</a>, enter your username and pay by <b>card</b> (Stripe) on our secure checkout, or by Zelle to cheesetv795@gmail.com. Renewals extend this same login, so there's no new login to set up.</p>
 <p>Questions? Just reply to this email.</p><p>Enjoy!<br>CheeseTV</p></div>`;
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST", headers: { Authorization: `Bearer ${s.resend}`, "Content-Type": "application/json" },

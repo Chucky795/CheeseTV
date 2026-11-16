@@ -1,5 +1,5 @@
 /* CheeseTV card checkout (PayMeGate). Orders are created server-side (paymegate-checkout); product links are the fallback. No API key here.
-   Card, Apple Pay, Google Pay, PayPal, Cash App and Venmo are handled on PayMeGate's page.
+   Card (Stripe) is the only method we promote; it is handled on PayMeGate's page.
    Prices are fixed on PayMeGate (price override disabled), so the link can't be used to pay less. */
 (function(w){
 'use strict';
